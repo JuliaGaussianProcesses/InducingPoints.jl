@@ -1,14 +1,21 @@
-seed!(42)
-N = 20
-D = 3
-nInd = 10
-k = transform(SqExponentialKernel(), 10.0)
-X = rand(N, D)
-y = rand(N)
-
 @testset "k-Means" begin
-    alg = Kmeans(nInd)
-    @test repr(alg) == "k-Means Selection of Inducing Points (k : $(nInd))"
-    AGP.IPModule.init!(alg, X, y, k)
-    @test size(alg) == (nInd, D)
+    seed!(42)
+    N = 20
+    nDim = 3
+    M = 10
+
+    X = rand(N, nDim)
+    Z = KmeansIP(X, M, obsdim = 1)
+    @test repr(Z) == "k-Means Selection of Inducing Points (k : $(M))"
+    @test size(Z) == (M)
+    Z = KmeansIP(X, M, obsdim = 1, weights = rand(N))
+    @test size(Z) == (M)
+    @test size(first(X)) == (nDim)
+
+    X = rand(nDim, N)
+    Z = KmeansIP(X, M, obsdim = 2)
+    @test size(Z) == (M)
+    Z = KmeansIP(X, M, obsdim = 2, weights = rand(N))
+    @test size(Z) == (M)
+    @test size(first(X)) == (nDim)
 end

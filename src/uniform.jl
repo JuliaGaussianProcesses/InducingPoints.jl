@@ -1,13 +1,11 @@
-mutable struct UniformSampling{T,M<:AbstractMatrix{T}} <: AIP{T,M}
-    k::Int64
-    Z::M
-    function UniformSampling(nInducingPoints::Integer)
-        return new{Float64,Matrix{Float64}}(nInducingPoints)
-    end
+mutable struct UniformSampling{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
+    k::Int
+    Z::TZ
 end
 
-function init!(alg::UniformSampling, X, y, kernel)
+function uniformsampling(X::AbstractMatrix, k::Int)
     @assert size(X, 1) >= alg.k "Input data not big enough given $k"
     samp = sample(1:size(X, 1), alg.k, replace = false)
     alg.Z = X[samp, :]
+    UniformSampling
 end

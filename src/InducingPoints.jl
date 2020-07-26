@@ -1,6 +1,7 @@
 module InducingPoints
 
-export InducingPoints, AbstractInducingPoints
+export AbstractInducingPoints
+export KmeansIP
 export Webscale, OIPS, Kmeans, kDPP, StdDPP, SeqDPP, Greedy, UniformSampling, UniGrid
 export init!, add_point!, remove_point!
 
@@ -13,7 +14,7 @@ using DataStructures
 using KernelFunctions
 using KernelFunctions: ColVecs
 using Random: rand, bitrand, AbstractRNG, MersenneTwister
-using Flux.Optimise
+using Requires
 import Base: rand, show
 
 const jitt = 1e-5
@@ -31,9 +32,9 @@ abstract type OnlineInducingPoints{S, TZ<:AbstractVector{S}} <: AIP{S, TZ} end
 const OnIP = OnlineInducingPoints
 
 
-struct InducingPoints{S,TZ<:AbstractVector{S}} <: InducingPoints{S,TZ}
-    Z::TZ
-end
+# struct InducingPoints{S,TZ<:AbstractVector{S}} <: InducingPoints{S,TZ}
+#     Z::TZ
+# end
 
 init!(ip::AIP, args...) = nothing
 add_point!(ip::AIP, args...) = nothing

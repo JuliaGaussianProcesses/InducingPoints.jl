@@ -8,7 +8,6 @@ Method from the paper include reference here.
 mutable struct OIPS{T,M<:AbstractMatrix{T}} <: AIP{T,M}
     ρ_accept::Float64
     ρ_remove::Float64
-    opt::O
     kmax::Float64
     η::Float64
     k::Int64
@@ -23,10 +22,9 @@ mutable struct OIPS{T,M<:AbstractMatrix{T}} <: AIP{T,M}
         @assert 0.0 <= η <= 1.0 "η should be between 0 and 1"
         ρ_remove = isinf(ρ_remove) ? sqrt(ρ_accept) : ρ_remove
         @assert 0.0 <= ρ_remove <= 1.0 "ρ_remove should be between 0 and 1"
-        return new{Float64,Matrix{Float64},typeof(opt)}(
+        return new{Float64,Matrix{Float64}}(
             ρ_accept,
             ρ_remove,
-            opt,
             kmax,
             η,
         )
@@ -34,10 +32,9 @@ mutable struct OIPS{T,M<:AbstractMatrix{T}} <: AIP{T,M}
     function OIPS(kmax::Int, η::Real = 0.98)
         @assert kmax > 0 "kmax should be bigger than 0"
         @assert 0.0 <= η <= 1.0 "η should be between 0 and 1"
-        return new{Float64,Matrix{Float64},typeof(opt)}(
+        return new{Float64,Matrix{Float64}}(
             0.95,
             sqrt(0.95),
-            opt,
             kmax,
             η,
         )

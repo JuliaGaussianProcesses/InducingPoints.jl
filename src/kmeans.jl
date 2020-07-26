@@ -1,9 +1,9 @@
-mutable struct KmeansIP{S,TZ<:AbstractVector{S}} <: AIP{T,TZ}
+mutable struct KmeansIP{S,TZ<:AbstractVector{S}} <: AIP{S,TZ}
   k::Int64
   Z::TZ
 end
 
-function Kmeans(
+function KmeansIP(
   X::AbstractMatrix,
   m::Integer;
   obsdim = 2,
@@ -11,7 +11,7 @@ function Kmeans(
   weights = nothing,
   tol::Real = 1e-3,
 )
-  @assert size(X, obsdim) >= alg.k "Input data not big enough given $(alg.k)"
+  @assert size(X, obsdim) >= m "Input data not big enough given $(alg.k)"
   return KMeans(
     m,
     kmeans_ip(
@@ -19,7 +19,7 @@ function Kmeans(
       m,
       obsdim = obsdim,
       nMarkov = nMarkov,
-      kweights = weights,
+      weights = weights,
       tol = tol,
     ),
   )
@@ -29,20 +29,15 @@ end
 Base.show(io::IO, alg::KmeansIP) =
   print(io, "k-Means Selection of Inducing Points (k : $(alg.k))")
 
-function init!(alg::Kmeans, X, y, kernel; tol = 1e-3)
-  @assert size(X, 1) >= alg.k "Input data not big enough given $(alg.k)"
-  alg.Z = kmeans_ip(X, alg.k, nMarkov = alg.nMarkov, tol = tol)
-end
-
 #Return K inducing points from X, m being the number of Markov iterations for the seeding
 function kmeans_ip(
-  X::AbstractArray{T,N},
+  X::AbstractMatrix,
   nC::Integer;
   obsdim::Int = 2,
   nMarkov::Int = 10,
   weights = nothing,
   tol = 1e-3,
-) where {T,N}
+)
   if obsdim == 2
     C = kmeans_seeding(X', nC, nMarkov)
     if !isnothing(weights)
@@ -72,6 +67,7 @@ function kmeans_seeding(
   #Preprocessing, sample first random center
   init = rand(1:nSamples, 1)
   C = zeros(T, nDim, nC)
+  @show X[:, init]
   C[:, 1] .= X[:, init]
   q = vec(pairwise(SqEuclidean(), X, C[:, 1:1], dims = 2))
   sumq = sum(q)
