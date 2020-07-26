@@ -11,18 +11,28 @@ using Clustering: kmeans!
 using Distances
 using DataStructures
 using KernelFunctions
+using KernelFunctions: ColVecs
 using Random: rand, bitrand, AbstractRNG, MersenneTwister
 using Flux.Optimise
 import Base: rand, show
 
 const jitt = 1e-5
 
-abstract type AbstractInducingPoints{T, M<:AbstractMatrix{T}} <: AbstractMatrix{T} end
+abstract type AbstractInducingPoints{S, TZ<:AbstractVector{S}} <: AbstractVector{S} end
 
 const AIP = AbstractInducingPoints
 
-struct InducingPoints{T,M<:AbstractMatrix{T}} <: InducingPoints{T,M}
-    Z::M
+abstract type OfflineInducingPoints{S, TZ<:AbstractVector{S}} <: AIP{S, TZ} end
+
+const OffIP = OfflineInducingPoints
+
+abstract type OnlineInducingPoints{S, TZ<:AbstractVector{S}} <: AIP{S, TZ} end
+
+const OnIP = OnlineInducingPoints
+
+
+struct InducingPoints{S,TZ<:AbstractVector{S}} <: InducingPoints{S,TZ}
+    Z::TZ
 end
 
 init!(ip::AIP, args...) = nothing
@@ -30,7 +40,6 @@ add_point!(ip::AIP, args...) = nothing
 remove_point!(ip::AIP, args...) = nothing
 
 Base.size(Z::AIP) = size(Z.Z)
-Base.size(Z::AIP, i::Int) = size(Z.Z, i)
 Base.getindex(Z::AIP, i::Int) = getindex(Z.Z, i)
 Base.getindex(Z::AIP, i::Int, j::Int) = getindex(Z.Z, i, j)
 
@@ -48,7 +57,7 @@ include("kmeans.jl")
 include("greedy.jl")
 include("uniform.jl")
 include("unigrid.jl")
-@requi
+
 
 
 end

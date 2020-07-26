@@ -1,17 +1,32 @@
-mutable struct Kmeans{T,M<:AbstractMatrix{T}} <: AIP{T,M}
+mutable struct KmeansIP{S,TZ<:AbstractVector{S}} <: AIP{T,TZ}
   k::Int64
-  nMarkov::Int64
-  Z::M
-  function Kmeans(nInducingPoints::Integer; nMarkov = 10)
-    return new{Float64,Matrix{Float64}}(
-      nInducingPoints,
-      opt,
-      nMarkov,
-    )
-  end
+  Z::TZ
 end
 
-Base.show(io::IO, alg::Kmeans) =
+function Kmeans(
+  X::AbstractMatrix,
+  m::Integer;
+  obsdim = 2,
+  nMarkov = 10,
+  weights = nothing,
+  tol::Real = 1e-3,
+)
+  @assert size(X, obsdim) >= alg.k "Input data not big enough given $(alg.k)"
+  return KMeans(
+    m,
+    kmeans_ip(
+      X,
+      m,
+      obsdim = obsdim,
+      nMarkov = nMarkov,
+      kweights = weights,
+      tol = tol,
+    ),
+  )
+end
+
+
+Base.show(io::IO, alg::KmeansIP) =
   print(io, "k-Means Selection of Inducing Points (k : $(alg.k))")
 
 function init!(alg::Kmeans, X, y, kernel; tol = 1e-3)
@@ -19,66 +34,68 @@ function init!(alg::Kmeans, X, y, kernel; tol = 1e-3)
   alg.Z = kmeans_ip(X, alg.k, nMarkov = alg.nMarkov, tol = tol)
 end
 
+#Return K inducing points from X, m being the number of Markov iterations for the seeding
+function kmeans_ip(
+  X::AbstractArray{T,N},
+  nC::Integer;
+  obsdim::Int = 2,
+  nMarkov::Int = 10,
+  weights = nothing,
+  tol = 1e-3,
+) where {T,N}
+  if obsdim == 2
+    C = kmeans_seeding(X', nC, nMarkov)
+    if !isnothing(weights)
+      kmeans!(X', C, weights = weights, tol = tol)
+    else
+      kmeans!(X', C, tot = tol)
+    end
+    return ColVecs(C)
+  elseif obsdim == 1
+    C = kmeans_seeding(X, nC, nMarkov)
+    if !isnothing(weights)
+      kmeans!(X, C, weights = weights, tol = tol)
+    else
+      kmeans!(X, C, tol = tol)
+    end
+    return ColVecs(C)
+  end
+end
+
 """Fast and efficient seeding for KMeans based on [`Fast and Provably Good Seeding for k-Means](https://las.inf.ethz.ch/files/bachem16fast.pdf)"""
 function kmeans_seeding(
-  X::AbstractArray{T,N},
+  X::AbstractMatrix{T},
   nC::Integer,
   nMarkov::Integer,
-) where {T,N} #X is the data, nC the number of centers wanted, m the number of Markov iterations
-  NSamples = size(X, 1)
+) where {T} #X is the data, nC the number of centers wanted, m the number of Markov iterations
+  nDim, nSamples = size(X)
   #Preprocessing, sample first random center
-  init = sample(1:NSamples, 1)
-  C = zeros(nC, size(X, 2))
-  C[1, :] = X[init, :]
-  q = zeros(NSamples)
-  for i = 1:NSamples
-    q[i] = 0.5 * norm(X[i, :] .- C[1])^2
-  end
+  init = rand(1:nSamples, 1)
+  C = zeros(T, nDim, nC)
+  C[:, 1] .= X[:, init]
+  q = vec(pairwise(SqEuclidean(), X, C[:, 1:1], dims = 2))
   sumq = sum(q)
-  q = Weights(q / sumq .+ 1.0 / (2 * NSamples), 1)
+  q = Weights(q / sumq .+ 1.0 / (2 * nSamples), 1)
   for i = 2:nC
-    x = X[sample(1:NSamples, q, 1), :] #weighted sampling,
-    mindist = mindistance(x, C, i - 1)
+    x = X[:, sample(q)] # weighted sampling,
+    mindist = mindistance(x, C)
     for j = 2:nMarkov
-      y = X[sample(q), :] #weighted sampling
-      dist = mindistance(y, C, i - 1)
+      y = X[:, sample(q)] #weighted sampling
+      dist = mindistance(y, C)
       if (dist / mindist > rand())
         x = y
         mindist = dist
       end
     end
-    C[i, :] = x
+    C[:, i] .= x
   end
   return C
 end
 
-#Return K inducing points from X, m being the number of Markov iterations for the seeding
-function kmeans_ip(
-  X::AbstractArray{T,N},
-  nC::Integer;
-  nMarkov::Integer = 10,
-  kweights::Vector{T} = [0.0],
-  tol = 1e-3,
-) where {T,N}
-  C = copy(transpose(kmeans_seeding(X, nC, nMarkov)))
-  if kweights != [0.0]
-    kmeans!(copy(transpose(X)), C, weights = kweights, tol = tol)
-  else
-    kmeans!(copy(transpose(X)), C)
-  end
-  return copy(transpose(C))
-end
-
-
-#Compute the minimum distance
+#Compute the minimum distance between a vector and a collection of vectors
 function mindistance(
-  x::AbstractArray{T,N1},
-  C::AbstractArray{T,N2},
-  nC::Integer,
-) where {T,N1,N2}#Point to look for, collection of centers, number of centers computed
-  mindist = Inf
-  for i = 1:nC
-    mindist = min.(norm(x .- C[i])^2, mindist)
-  end
-  return mindist
+  x::AbstractVector,
+  C::AbstractMatrix,
+)#Point to look for, collection of centers, number of centers computed
+  return minimum(pairwise(SqEuclidean(), C, permutedims(x), dims = 2))
 end
