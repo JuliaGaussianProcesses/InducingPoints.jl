@@ -7,15 +7,15 @@
     X = rand(N, nDim)
     Z = KmeansIP(X, M, obsdim = 1)
     @test repr(Z) == "k-Means Selection of Inducing Points (k : $(M))"
-    @test size(Z) == (M)
+    @test length(Z) == M
     Z = KmeansIP(X, M, obsdim = 1, weights = rand(N))
-    @test size(Z) == (M)
-    @test size(first(X)) == (nDim)
+    @test length(Z) == M
+    @test length(first(Z)) == nDim
 
     X = rand(nDim, N)
     Z = KmeansIP(X, M, obsdim = 2)
-    @test size(Z) == (M)
+    @test length(Z) == M
     Z = KmeansIP(X, M, obsdim = 2, weights = rand(N))
-    @test size(Z) == (M)
-    @test size(first(X)) == (nDim)
+    @test length(Z) == M
+    @test length(first(Z)) == nDim
 end

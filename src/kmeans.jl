@@ -12,7 +12,7 @@ function KmeansIP(
   tol::Real = 1e-3,
 )
   @assert size(X, obsdim) >= m "Input data not big enough given $(alg.k)"
-  return KMeans(
+  return KmeansIP(
     m,
     kmeans_ip(
       X,
@@ -39,19 +39,19 @@ function kmeans_ip(
   tol = 1e-3,
 )
   if obsdim == 2
-    C = kmeans_seeding(X', nC, nMarkov)
-    if !isnothing(weights)
-      kmeans!(X', C, weights = weights, tol = tol)
-    else
-      kmeans!(X', C, tot = tol)
-    end
-    return ColVecs(C)
-  elseif obsdim == 1
     C = kmeans_seeding(X, nC, nMarkov)
     if !isnothing(weights)
       kmeans!(X, C, weights = weights, tol = tol)
     else
       kmeans!(X, C, tol = tol)
+    end
+    return ColVecs(C)
+  elseif obsdim == 1
+    C = kmeans_seeding(X', nC, nMarkov)
+    if !isnothing(weights)
+      kmeans!(X', C, weights = weights, tol = tol)
+    else
+      kmeans!(X', C, tol = tol)
     end
     return ColVecs(C)
   end
@@ -65,19 +65,18 @@ function kmeans_seeding(
 ) where {T} #X is the data, nC the number of centers wanted, m the number of Markov iterations
   nDim, nSamples = size(X)
   #Preprocessing, sample first random center
-  init = rand(1:nSamples, 1)
+  init = rand(1:nSamples)
   C = zeros(T, nDim, nC)
-  @show X[:, init]
   C[:, 1] .= X[:, init]
   q = vec(pairwise(SqEuclidean(), X, C[:, 1:1], dims = 2))
   sumq = sum(q)
   q = Weights(q / sumq .+ 1.0 / (2 * nSamples), 1)
   for i = 2:nC
     x = X[:, sample(q)] # weighted sampling,
-    mindist = mindistance(x, C)
+    mindist = mindistance(x, C, i - 1)
     for j = 2:nMarkov
       y = X[:, sample(q)] #weighted sampling
-      dist = mindistance(y, C)
+      dist = mindistance(y, C, i - 1)
       if (dist / mindist > rand())
         x = y
         mindist = dist
@@ -92,6 +91,7 @@ end
 function mindistance(
   x::AbstractVector,
   C::AbstractMatrix,
+  nC::Int
 )#Point to look for, collection of centers, number of centers computed
-  return minimum(pairwise(SqEuclidean(), C, permutedims(x), dims = 2))
+  return minimum(evaluate(SqEuclidean(), c, x) for c in eachcol(C[:, 1:nC]))
 end
