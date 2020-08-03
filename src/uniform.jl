@@ -1,11 +1,25 @@
-mutable struct UniformSampling{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
+"""
+
+
+Uniform sampling of a subset of the data.
+
+"""
+struct UniformSampling{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
     k::Int
     Z::TZ
 end
 
-function uniformsampling(X::AbstractMatrix, k::Int)
-    @assert size(X, 1) >= alg.k "Input data not big enough given $k"
-    samp = sample(1:size(X, 1), alg.k, replace = false)
-    alg.Z = X[samp, :]
-    UniformSampling
+function UniformSampling(X::AbstractVector, m::Int; weights = nothing)
+    UniformSampling(m, uniformsamplig_ip(X, m, weights))
+end
+
+function uniformsampling(X::AbstractVector, m::Int, weights)
+    N = size(X, 1)
+    N >= m || "Input data not big enough given $k"
+    samp = if isnothing(weights)
+        sample(1:N, m, replace = false)
+    else
+        sample(1:N, m, replace = false, weights = weights)
+    end
+    Z = X[samp]
 end

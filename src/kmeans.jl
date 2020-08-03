@@ -1,17 +1,28 @@
-mutable struct KmeansIP{S,TZ<:AbstractVector{S}} <: AIP{S,TZ}
-  k::Int64
+"""
+  KMeansIP(X::AbstractMatrix, m; obsdim = 1, nMarkov = 10, weights = nothing, tol = 1e-3)
+  KMeansIP(X::AbstractVector, m; nMarkov = 10, weights = nothing, tol = 1e-3)
+
+k-Means [1] initialization on the data `X` taking `m` inducing points.
+The seeding is computed via [2], `nMarkov` gives the number of MCMC steps for the seeding.
+Additionally `weights` can be attributed to each data point
+
+[1] Arthur, D. & Vassilvitskii, S. k-means++: The advantages of careful seeding. in Proceedings of the eighteenth annual ACM-SIAM symposium on Discrete algorithms 1027–1035 (Society for Industrial and Applied Mathematics, 2007).
+[2] Bachem, O., Lucic, M., Hassani, S. H. & Krause, A. Fast and Provably Good Seedings for k-Means. Advances in Neural Information Processing Systems 29 55--63 (2016) doi:10.1109/tmtt.2005.863818.
+"""
+struct KmeansIP{S,TZ<:AbstractVector{S}} <: AIP{S,TZ}
+  k::Int
   Z::TZ
 end
 
 function KmeansIP(
   X::AbstractMatrix,
   m::Integer;
-  obsdim = 2,
+  obsdim = 1,
   nMarkov = 10,
   weights = nothing,
   tol::Real = 1e-3,
 )
-  @assert size(X, obsdim) >= m "Input data not big enough given $(alg.k)"
+  size(X, obsdim) >= m || "Input data not big enough given $(m)"
   return KmeansIP(
     m,
     kmeans_ip(

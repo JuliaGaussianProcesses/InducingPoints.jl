@@ -1,7 +1,7 @@
 ##From paper "An Algorithm for Online K-Means Clustering" ##
 
 
-mutable struct StreamOnline{T,M<:AbstractMatrix{T}} <: AIP{T,M}
+mutable struct StreamOnline{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
     k_target::Int64
     k_efficient::Int64
     k::Int64

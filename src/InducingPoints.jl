@@ -2,11 +2,13 @@ module InducingPoints
 
 export AbstractInducingPoints
 export KmeansIP
+export OptimIP
 export Webscale, OIPS, Kmeans, kDPP, StdDPP, SeqDPP, Greedy, UniformSampling, UniGrid
 export init!, add_point!, remove_point!
 
 using StatsBase: Weights, sample
 using DeterminantalPointProcesses
+using AbstractGPs
 using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
 using Clustering: kmeans!
 using Distances
@@ -32,10 +34,13 @@ abstract type OnlineInducingPoints{S, TZ<:AbstractVector{S}} <: AIP{S, TZ} end
 const OnIP = OnlineInducingPoints
 
 
-# struct InducingPoints{S,TZ<:AbstractVector{S}} <: InducingPoints{S,TZ}
-#     Z::TZ
-# end
+struct CustomInducingPoints{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
+     Z::TZ
+end
 
+function Base.convert(::Type{AbstractInducingPoint}, X::AbstractVector)
+    CustomInducingPoints(X)
+end
 init!(ip::AIP, args...) = nothing
 add_point!(ip::AIP, args...) = nothing
 remove_point!(ip::AIP, args...) = nothing
@@ -45,7 +50,7 @@ Base.getindex(Z::AIP, i::Int) = getindex(Z.Z, i)
 Base.getindex(Z::AIP, i::Int, j::Int) = getindex(Z.Z, i, j)
 
 function __init__()
-    @require Flux="587475ba-b771-5e3f-ad9e-33799f191a9c" include("opt_IP.jl")
+    @require Flux="587475ba-b771-5e3f-ad9e-33799f191a9c" include("optimIP.jl")
 end
 
 include("seqdpp.jl")

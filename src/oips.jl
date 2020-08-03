@@ -5,13 +5,13 @@
 Online Inducing Points Selection.
 Method from the paper include reference here.
 """
-mutable struct OIPS{T,M<:AbstractMatrix{T}} <: AIP{T,M}
+mutable struct OIPS{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
     ρ_accept::Float64
     ρ_remove::Float64
     kmax::Float64
     η::Float64
-    k::Int64
-    Z::M
+    k::Int
+    Z::TZ
     function OIPS(
         ρ_accept::Real = 0.8;
         η::Real = 0.95,
