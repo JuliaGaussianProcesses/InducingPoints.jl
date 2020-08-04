@@ -4,7 +4,7 @@ export AbstractInducingPoints
 export KmeansIP
 export OptimIP
 export Webscale, OIPS, Kmeans, kDPP, StdDPP, SeqDPP, Greedy, UniformSampling, UniGrid
-export init!, add_point!, remove_point!
+# export init!, add_point!, remove_point!
 
 using StatsBase: Weights, sample
 using DeterminantalPointProcesses
@@ -15,7 +15,6 @@ using DataStructures
 using KernelFunctions
 using KernelFunctions: ColVecs
 using Random: rand, bitrand, AbstractRNG, MersenneTwister
-using Requires
 import Base: rand, show
 
 const jitt = 1e-5
@@ -48,10 +47,7 @@ end
 #     CustomInducingPoints(X)
 # end
 
-function __init__()
-    @require Flux="587475ba-b771-5e3f-ad9e-33799f191a9c" include("optimIP.jl")
-end
-
+include("optimIP.jl")
 include("seqdpp.jl")
 include("kdpp.jl")
 include("stddpp.jl")
