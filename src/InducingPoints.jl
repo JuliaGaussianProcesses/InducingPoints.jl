@@ -8,7 +8,6 @@ export init!, add_point!, remove_point!
 
 using StatsBase: Weights, sample
 using DeterminantalPointProcesses
-using AbstractGPs
 using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
 using Clustering: kmeans!
 using Distances
@@ -45,9 +44,9 @@ struct CustomInducingPoints{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
      Z::TZ
 end
 
-function Base.convert(::Type{<:AbstractInducingPoints}, X::AbstractVector)
-    CustomInducingPoints(X)
-end
+# function Base.convert(::Type{<:AbstractInducingPoints}, X::AbstractVector{<:AbstractVector{<:Real}})
+#     CustomInducingPoints(X)
+# end
 
 function __init__()
     @require Flux="587475ba-b771-5e3f-ad9e-33799f191a9c" include("optimIP.jl")
