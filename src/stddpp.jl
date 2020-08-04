@@ -8,7 +8,7 @@ The size of the returned `Z` is variable
 struct StdDPP{S,TZ<:AbstractVector{S},K<:Kernel} <: OffIP{S,TZ}
     kernel::K
     k::Int
-    Z::M
+    Z::TZ
 end
 
 function StdDPP(X::AbstractVector, kernel::K) where {K<:Kernel}

@@ -82,7 +82,7 @@ function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, Ï
                 best_L = L
             end
         end
-        @info "Found best L :$best_L $v/$k"
+        @info "Found best L :$best_L $v/$m"
         push!(Z, X[i])
         push!(IP_set, i)
     end
