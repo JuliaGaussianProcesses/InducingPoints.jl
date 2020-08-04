@@ -44,7 +44,7 @@ Base.show(io::IO, alg::KmeansIP) =
 function kmeans_ip(
   X::AbstractMatrix,
   nC::Integer;
-  obsdim::Int = 2,
+  obsdim::Int = 1,
   nMarkov::Int = 10,
   weights = nothing,
   tol = 1e-3,
