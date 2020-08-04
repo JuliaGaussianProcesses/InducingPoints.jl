@@ -15,9 +15,9 @@ mutable struct OIPS{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
     Z::TZ
 end
 
-Base.show(io::IO, alg::OIPS) = print(
+Base.show(io::IO, Z::OIPS) = print(
     io,
-    "Online Inducing Point Selection (ρ_in : $(alg.ρ_accept), ρ_out : $(alg.ρ_remove), kmax : $(alg.kmax))",
+    "Online Inducing Point Selection (ρ_in : $(Z.ρ_accept), ρ_out : $(Z.ρ_remove), kmax : $(Z.kmax))",
 )
 
 function OIPS(
@@ -25,12 +25,12 @@ function OIPS(
     η::Real = 0.95,
     kmax::Real = Inf,
     ρ_remove::Real = Inf,
-    kmin::Real = 10,
+    kmin::Real = 10.0,
 )
-    @assert 0.0 <= ρ_accept <= 1.0 "ρ_accept should be between 0 and 1"
-    @assert 0.0 <= η <= 1.0 "η should be between 0 and 1"
+    0.0 <= ρ_accept <= 1.0 || error("ρ_accept should be between 0 and 1")
+    0.0 <= η <= 1.0 || error("η should be between 0 and 1")
     ρ_remove = isinf(ρ_remove) ? sqrt(ρ_accept) : ρ_remove
-    @assert 0.0 <= ρ_remove <= 1.0 "ρ_remove should be between 0 and 1"
+    0.0 <= ρ_remove <= 1.0 || error("ρ_remove should be between 0 and 1")
     return OIPS(
         ρ_accept,
         ρ_remove,
@@ -43,8 +43,8 @@ function OIPS(
 end
 
 function OIPS(kmax::Int, η::Real = 0.98, kmin::Real = 10)
-    @assert kmax > 0 "kmax should be bigger than 0"
-    @assert 0.0 <= η <= 1.0 "η should be between 0 and 1"
+    kmax > 0 || error("kmax should be bigger than 0")
+    0.0 <= η <= 1.0 || error("η should be between 0 and 1")
     return OIPS(
         0.95,
         sqrt(0.95),
@@ -56,17 +56,17 @@ function OIPS(kmax::Int, η::Real = 0.98, kmin::Real = 10)
     )
 end
 
-function OIPS(Z::OIPS, X::AbstractVector, k::Kernel)
+function OIPS(Z::OIPS, X::AbstractVector)
     N = size(X, 1)
-    N >= Z.kmin || "First batch should have at least $(Z.kmin) samples"
+    N >= Z.kmin || error("First batch should have at least $(Z.kmin) samples")
     samples = sample(1:N, 10, replace = false)
     return OIPS(Z.ρ_accept, Z.ρ_remove, Z.kmax, Z.kmin, Z.η, 10, deepcopy(X[samples]))
 end
 
-function init(alg::OIPS, X::AbstractVector, k::Kernel)
-    alg = OIPS(alg, X)
-    update!(alg, X, gp)
-    return alg
+function init(Z::OIPS, X::AbstractVector, k::Kernel)
+    Z = OIPS(Z, X)
+    update!(Z, X, k)
+    return Z
 end
 
 function update!(Z::OIPS, X::AbstractVector, k::Kernel)
@@ -76,13 +76,13 @@ end
 function add_point!(Z::OIPS, X::AbstractVector, k::Kernel)
     b = size(X, 1)
     for i = 1:b # Parse all points from X
-        k = kernelmatrix(k, X[i], Z)
-        # d = find_nearest_center(X[i,:],alg.centers,kernel)[2]
-        if maximum(k) < Z.ρ_accept #If biggest correlation is smaller than threshold add point
-            alg.Z = push!(Z.Z, deepcopy(X[i]))
-            alg.k += 1
+        kx = kernelmatrix(k, [X[i]], Z)
+        # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
+        if maximum(kx) < Z.ρ_accept #If biggest correlation is smaller than threshold add point
+            Z.Z = push!(Z.Z, deepcopy(X[i]))
+            Z.k += 1
         end
-        while alg.k > alg.kmax ## If maximum number of points is reached, readapt the threshold
+        while Z.k > Z.kmax ## If maximum number of points is reached, readapt the threshold
             K = kernelmatrix(k, Z)
             m = maximum(K - Diagonal(K))
             Z.ρ_remove = Z.η * m
