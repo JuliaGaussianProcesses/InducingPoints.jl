@@ -2,12 +2,12 @@
 
 
 mutable struct StreamOnline{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
-    k_target::Int64
-    k_efficient::Int64
-    k::Int64
+    k_target::Int
+    k_efficient::Int
+    k::Int
     f::Float64
-    q::Int64
-    Z::M
+    q::Int
+    Z::TZ
     function StreamOnline(k_target::Int64)
         return new{Float64,Matrix{Float64}}(k_target)
     end
