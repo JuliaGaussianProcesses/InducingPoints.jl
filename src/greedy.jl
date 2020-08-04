@@ -1,6 +1,12 @@
 """
-    GreedyIP(X::AbstractVector, m::Int, y, S, kernel, σ²)
-    GreedyIP(X::AbstractMatrix, m::Int, y, S, kernel, σ²; obsdim = 1)
+    GreedyIP(X::AbstractVector, m::Int, y, s, kernel, σ²)
+    GreedyIP(X::AbstractMatrix, m::Int, y, s, kernel, σ²; obsdim = 1)
+
+ - `X` is the input data
+ - `m` is the desired number of inducing points
+ - `y` is the output data
+ - `s` is the minibatch size on which to select a new inducing point
+ - `σ²` is the likelihood noise
 
 Greedy approach first proposed by Titsias[1].
 Algorithm loops over minibatches of data and select the best ELBO improvement.
@@ -8,7 +14,7 @@ Algorithm loops over minibatches of data and select the best ELBO improvement.
 [1] Titsias, M. Variational Learning of Inducing Variables in Sparse Gaussian Processes. Aistats 5, 567–574 (2009).
 """
 mutable struct GreedyIP{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
-    S::Int
+    s::Int
     k::Int
     Z::TZ
 end
@@ -17,7 +23,7 @@ function GreedyIP(
     X::AbstractMatrix,
     m::Int,
     y::AbstractVector,
-    S::Int,
+    s::Int,
     kernel::Kernel,
     σ²::Real;
     obsdim::Int = 1,
@@ -26,7 +32,7 @@ function GreedyIP(
         KernelFunctions.vec_of_vecs(X, obsdim=obsdim),
         m::Int,
         y::AbstractVector,
-        S::Int,
+        s::Int,
         kernel::Kernel,
         σ²::Real,
     )
@@ -38,7 +44,7 @@ function GreedyIP(
     y::AbstractVector,
     S::Int,
     kernel::Kernel,
-    σ²::Real;
+    σ²::Real,
 )
     m > 0 || error("Number of inducing points should be positive")
     S > 0 || error("Size of the minibatch should be positive")
@@ -51,7 +57,7 @@ function GreedyIP(
     )
 end
 
-Base.show(io::IO, alg::Greedy) =
+Base.show(io::IO, alg::GreedyIP) =
     print(io, "Greedy Selection of Inducing Points")
 
 function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, σ², )
