@@ -4,7 +4,7 @@ export AbstractInducingPoints
 export KmeansIP
 export OptimIP
 export Webscale, OIPS, Kmeans, kDPP, StdDPP, SeqDPP, Greedy, UniformSampling, UniGrid
-# export init!, add_point!, remove_point!
+export init, update!
 
 using StatsBase: Weights, sample
 using DeterminantalPointProcesses
@@ -43,6 +43,8 @@ struct CustomInducingPoints{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
 end
 
 init(Z::OnIP, X::AbstractVector, k::Kernel) = init(Z, X)
+
+update!(Z::OnIP, args...) = add_point!(Z, args...)
 
 add_point!(Z::OnIP, X::AbstractVector, k::Kernel) = add_point!(Z, X)
 
