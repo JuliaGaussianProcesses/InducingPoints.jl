@@ -1,6 +1,6 @@
 name = "InducingPoints"
 uuid = "b4bd816d-b975-4295-ac05-5f2992945579"
-authors = ["Theo Galy-Fajou <theo.galyfajou@gmail.com> and contributors"]
+authors = ["Theo Galy-Fajou <theo.galyfajou@gmail.com> and JuliaGaussianProcesses"]
 version = "0.1.0"
 
 [deps]
