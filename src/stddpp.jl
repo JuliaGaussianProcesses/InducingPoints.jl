@@ -20,5 +20,5 @@ function stdpp_ip(X, kernel)
     K = Symmetric(kernelmatrix(kernel, X) + jitt * I)
     dpp = DPP(K)
     samp = rand(dpp, 1)[1]
-    Z = X[samp]
+    Z = Vector.(X[samp])
 end

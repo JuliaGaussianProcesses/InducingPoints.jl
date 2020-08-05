@@ -1,6 +1,5 @@
 """
   KMeansIP(X::AbstractMatrix, m; obsdim = 1, nMarkov = 10, weights = nothing, tol = 1e-3)
-  KMeansIP(X::AbstractVector, m; nMarkov = 10, weights = nothing, tol = 1e-3)
 
 k-Means [1] initialization on the data `X` taking `m` inducing points.
 The seeding is computed via [2], `nMarkov` gives the number of MCMC steps for the seeding.

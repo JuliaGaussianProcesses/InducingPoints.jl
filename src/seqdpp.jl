@@ -1,43 +1,45 @@
-mutable struct SeqDPP{T,M<:AbstractMatrix{T},K<:Kernel} <: AIP{T,M}
-    kernel::K
-    k::Int64
-    dpp::DPP
-    K::Symmetric{Float64,Matrix{Float64}}
-    Z::M
-    function SeqDPP(kernel::K) where {K<:Kernel}
-        return new{Float64,Matrix{Float64},K}(kernel)
-    end
+"""
+    SeqDPP()
+
+Sequential sampling via DeterminantalPointProcesses
+"""
+mutable struct SeqDPP{S,TZ<:AbstractVector{S},T} <: OnIP{S,TZ}
+    k::Int
+    K::Symmetric{T,Matrix{T}}
+    Z::TZ
 end
 
+Base.show(io::IO, Z::SeqDPP) = print(io, "Sequential DPP")
 
-function init!(alg::SeqDPP{T}, X, y, kernel; opt = Flux.ADAM(0.001)) where {T}
-    @assert size(X, 1) >= 3 "First batch should contain at least 2 elements"
-    jitt = T(Jittering())
-    alg.K = Symmetric(kernelmatrix(alg.kernel, X, obsdim = 1) + jitt * I)
-    alg.dpp = DPP(alg.K)
+SeqDPP() = SeqDPP(0, Symmetric(Matrix{Float64}(I(0))), [])
+
+function SeqDPP(X::AbstractVector, k::Kernel)
+    size(X, 1) > 2 || error("First batch should contain at least 3 elements")
+    K = Symmetric(kernelmatrix(k, X) + jitt * I)
+    dpp = DPP(K)
     samp = []
-    while length(samp) < 3
-        samp = rand(alg.dpp, 1)[1]
+    while length(samp) < 3 # Sample from a normal DPP until at least 3 elements are samples
+        samp = rand(dpp, 1)[1]
     end
-    alg.Z = X[samp, :]
-    alg.k = length(samp)
-    alg.K = Symmetric(
-        kernelmatrix(
-            alg.kernel,
-            reshape(X[samp, :], alg.k, size(X, 2)),
-            obsdim = 1,
-        ) + jitt * I,
-    )
+    Z = Vector.(X[samp])
+    m = length(samp)
+    K = Symmetric(kernelmatrix(k, Z) + jitt * I)
+    return SeqDPP(m, K, Z)
 end
-function add_point!(alg::SeqDPP{T}, X, y, kernel) where {T}
-    jitt = T(Jittering())
-    L = Symmetric(kernelmatrix(kernel, vcat(alg.Z, X), obsdim = 1) + jitt * I)
-    Iₐ = diagm(vcat(zeros(alg.k), ones(size(X, 1))))
-    Lₐ = inv(view(inv(L + Iₐ), (alg.k+1):size(L, 1), (alg.k+1):size(L, 1))) - I
+
+
+function init(Z::SeqDPP, X::AbstractVector, k::Kernel)
+    return SeqDPP(X, k)
+end
+
+function add_point!(Z::SeqDPP, X::AbstractVector, k::Kernel)
+    L = Symmetric(kernelmatrix(k, vcat(Z, X)) + jitt * I)
+    Iₐ = diagm(vcat(zeros(Z.k), ones(size(X, 1))))
+    Lₐ = inv(view(inv(L + Iₐ), (Z.k + 1):size(L, 1), (Z.k+1):size(L, 1))) - I
     new_dpp = DPP(Symmetric(Lₐ))
     new_samp = rand(new_dpp, 1)[1]
-    alg.Z = vcat(alg.Z, X[new_samp, :])
-    alg.k += length(new_samp)
+    Z = vcat(Z, Vector.(X[new_samp]))
+    Z.k += length(new_samp)
 end
 
 

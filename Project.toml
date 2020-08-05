@@ -19,8 +19,7 @@ Clustering = "0.14"
 DataStructures = "0.17"
 DeterminantalPointProcesses = "0.1"
 Distances = "0.9"
-KernelFunctions = "0.4"
-Requires = "1"
+KernelFunctions = "0.4, 0.5"
 StatsBase = "0.32,0.33"
 
 [extras]

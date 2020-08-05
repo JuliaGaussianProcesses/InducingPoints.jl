@@ -34,7 +34,6 @@ const OnIP = OnlineInducingPoints
 Base.size(Z::AIP) = size(Z.Z)
 Base.length(Z::AIP) = length(Z.Z)
 Base.getindex(Z::AIP, i::Int) = getindex(Z.Z, i)
-Base.getindex(Z::AIP, i::Int, j::Int) = getindex(getindex(Z.Z, i), j)
 Base.vec(Z::AIP) = Z.Z
 
 update!(Z::OnIP, X::AbstractVector) = error("`update!` is not implemented for type $(typeof(Z))")
@@ -43,9 +42,12 @@ struct CustomInducingPoints{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
      Z::TZ
 end
 
-# function Base.convert(::Type{<:AbstractInducingPoints}, X::AbstractVector{<:AbstractVector{<:Real}})
-#     CustomInducingPoints(X)
-# end
+init(Z::OnIP, X::AbstractVector, k::Kernel) = init(Z, X)
+
+add_point!(Z::OnIP, X::AbstractVector, k::Kernel) = add_point!(Z, X)
+
+remove_point!(Z::OnIP, args...) = nothing
+
 
 include("optimIP.jl")
 include("seqdpp.jl")

@@ -66,7 +66,7 @@ function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, Ï
     Z = Vector{eltype(X)}() #Initialize array of IPs
     IP_set = Set{Int}() # Keep track of selected points
     i = rand(1:N) # Take a random initial point
-    push!(Z, X[i]); push!(IP_set, i)
+    push!(Z, Vector(X[i])); push!(IP_set, i)
     for v = 2:m
         # Evaluate on a subset of the points of a maximum size of 1000
         X_te = sample(1:N, min(1000, N), replace = false)
@@ -89,7 +89,7 @@ function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, Ï
             end
         end
         @info "Found best L :$best_L $v/$m"
-        push!(Z, X[i])
+        push!(Z, Vector(X[i]))
         push!(IP_set, i)
     end
     return Z

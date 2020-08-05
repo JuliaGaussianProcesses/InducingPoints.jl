@@ -1,8 +1,8 @@
 """
-
+    UniformSampling(X::AbstractVector, m::Int; weights)
+    UniformSampling(X::AbstractMatrix, m::int; weights, obsdim = 1)
 
 Uniform sampling of a subset of the data.
-
 """
 struct UniformSampling{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
     k::Int
@@ -21,5 +21,5 @@ function uniformsampling(X::AbstractVector, m::Int, weights)
     else
         sample(1:N, m, replace = false, weights = weights)
     end
-    Z = X[samp]
+    Z = Vector.(X[samp])
 end

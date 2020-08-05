@@ -60,7 +60,7 @@ function OIPS(Z::OIPS, X::AbstractVector)
     N = size(X, 1)
     N >= Z.kmin || error("First batch should have at least $(Z.kmin) samples")
     samples = sample(1:N, 10, replace = false)
-    return OIPS(Z.ρ_accept, Z.ρ_remove, Z.kmax, Z.kmin, Z.η, 10, deepcopy(X[samples]))
+    return OIPS(Z.ρ_accept, Z.ρ_remove, Z.kmax, Z.kmin, Z.η, 10, Vector.(X[samples]))
 end
 
 function init(Z::OIPS, X::AbstractVector, k::Kernel)
@@ -79,7 +79,7 @@ function add_point!(Z::OIPS, X::AbstractVector, k::Kernel)
         kx = kernelmatrix(k, [X[i]], Z)
         # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
         if maximum(kx) < Z.ρ_accept #If biggest correlation is smaller than threshold add point
-            Z.Z = push!(Z.Z, deepcopy(X[i]))
+            Z.Z = push!(Z.Z, Vector(X[i]))
             Z.k += 1
         end
         while Z.k > Z.kmax ## If maximum number of points is reached, readapt the threshold

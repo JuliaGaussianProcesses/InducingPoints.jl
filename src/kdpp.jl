@@ -1,6 +1,6 @@
 """
-    kDPP(X::AbstractMatrix, m::Int, kernel::Kernel; obsdim::Int = 1)
     kDPP(X::AbstractVector, m::Int, kernel::Kernel)
+    kDPP(X::AbstractMatrix, m::Int, kernel::Kernel; obsdim::Int = 1)
 
 k-DPP (Determinantal Point Process) will return a subset of `X` of size `m`,
 according to DPP probability
@@ -22,11 +22,11 @@ end
 
 Base.show(io::IO, alg::kDPP) = print(io, "k-DPP selection of inducing points")
 
-function kdpp_ip(X, m, kernel)
+function kdpp_ip(X::AbstractVector, m::Int, kernel::Kernel)
     N = size(X, 1)
     Z = Vector{eltype(X)}()
     i = rand(1:N)
-    push!(Z, X[i])
+    push!(Z, Vector(X[i]))
     IP_set = Set(i)
     k = 1
     kᵢᵢ = kerneldiagmatrix(kernel, X) .+ jitt
@@ -37,7 +37,7 @@ function kdpp_ip(X, m, kernel)
         Vᵢ = kᵢᵢ[collect(X_set)] - diag(kᵢZ * inv(KZ) * kᵢZ')
         pᵢ = Vᵢ / sum(Vᵢ)
         j = sample(collect(X_set), Weights(pᵢ))
-        push!(Z, X[j]); push!(IP_set, j)
+        push!(Z, Vector(X[j])); push!(IP_set, j)
         k += 1
     end
 end
