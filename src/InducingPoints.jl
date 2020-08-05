@@ -13,7 +13,7 @@ using Clustering: kmeans!
 using Distances
 using DataStructures
 using KernelFunctions
-using KernelFunctions: ColVecs
+using KernelFunctions: ColVecs, RowVecs, vec_of_vecs
 using Random: rand, bitrand, AbstractRNG, MersenneTwister
 import Base: rand, show
 
@@ -36,15 +36,17 @@ Base.length(Z::AIP) = length(Z.Z)
 Base.getindex(Z::AIP, i::Int) = getindex(Z.Z, i)
 Base.vec(Z::AIP) = Z.Z
 
-update!(Z::OnIP, X::AbstractVector) = error("`update!` is not implemented for type $(typeof(Z))")
-
 struct CustomInducingPoints{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
      Z::TZ
 end
 
+init(Z::OnIP, X::AbstractMatrix, args...; obsdim = 1) = init(Z, vec_of_vecs(X, obsdim = obsdim), args...)
+
 init(Z::OnIP, X::AbstractVector, k::Kernel) = init(Z, X)
 
-update!(Z::OnIP, args...) = add_point!(Z, args...)
+update!(Z::OnIP, X::AbstractMatrix, args...; obsdim = 1) = init(Z, vec_of_vecs(X, obsdim = obsdim), args...)
+
+update!(Z::OnIP, X::AbstractVector, args...) = add_point!(Z, X, args...)
 
 add_point!(Z::OnIP, X::AbstractVector, k::Kernel) = add_point!(Z, X)
 
