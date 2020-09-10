@@ -55,11 +55,10 @@ function OIPS(kmax::Int, η::Real = 0.98, kmin::Real = 10)
         [],
     )
 end
-
 function OIPS(Z::OIPS, X::AbstractVector)
     N = size(X, 1)
     N >= Z.kmin || error("First batch should have at least $(Z.kmin) samples")
-    samples = sample(1:N, 10, replace = false)
+    samples = sample(1:N, floor(Int, Z.kmin), replace = false)
     return OIPS(Z.ρ_accept, Z.ρ_remove, Z.kmax, Z.kmin, Z.η, 10, Vector.(X[samples]))
 end
 

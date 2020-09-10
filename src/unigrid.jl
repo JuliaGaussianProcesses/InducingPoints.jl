@@ -6,7 +6,7 @@ Adaptive uniform grid based on [1]
 
 [1] Moreno-Muñoz, P., Artés-Rodríguez, A. & Álvarez, M. A. Continual Multi-task Gaussian Processes. (2019).
 """
-mutable struct UniGrid{S,TZ<:AbstractVector{T}} <: AIP{S,TZ}
+mutable struct UniGrid{S,TZ<:AbstractVector{S}} <: AIP{S,TZ}
     K::Int
     D::Int
     bounds::Vector{Vector{Float64}}
