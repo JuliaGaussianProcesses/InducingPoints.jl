@@ -1,12 +1,11 @@
-##From paper "An Algorithm for Online K-Means Clustering" ##
 """
-    StreamOnline(k_target::Int)
+    StreamKmeans(k_target::Int)
 
 Online clustering algorithm [1] to select inducing points in a streaming setting.
 Reference :
 [1] Liberty, E., Sriharsha, R. & Sviridenko, M. An Algorithm for Online K-Means Clustering. arXiv:1412.5721 [cs] (2015).
 """
-mutable struct StreamOnline{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
+mutable struct StreamKmeans{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
     k_target::Int
     k_efficient::Int
     k::Int
@@ -15,9 +14,9 @@ mutable struct StreamOnline{S,TZ<:AbstractVector{S}} <: OnIP{S,TZ}
     Z::TZ
 end
 
-StreamOnline(k_target::Int) = StreamOnline(k_target, 0, 0, 0.0, 0, [])
+StreamKmeans(k_target::Int) = StreamKmeans(k_target, 0, 0, 0.0, 0, [])
 
-function StreamOnline(Z::StreamOnline, X::AbstractVector, kernel = nothing)
+function StreamKmeans(Z::StreamKmeans, X::AbstractVector, kernel = nothing)
     size(X, 1) > 10 ||
         error("The first batch of data should be bigger than 10 samples")
     k_efficient = max(1, ceil(Int64, (Z.k_target - 15) / 5))
@@ -33,14 +32,14 @@ function StreamOnline(Z::StreamOnline, X::AbstractVector, kernel = nothing)
     end
     f = sum(sort(w)[1:10]) #Take the 10 smallest values
     q = 0
-    StreamOnline(Z.k_target, k_efficient, k, f, q, Z)
+    StreamKmeans(Z.k_target, k_efficient, k, f, q, Z)
 end
 
-function init(Z::StreamOnline, X::AbstractVector)
-    Z = StreamOnline(Z, X)
+function init(Z::StreamKmeans, X::AbstractVector)
+    Z = StreamKmeans(Z, X)
 end
 
-function add_point!(alg::StreamOnline, X::AbstractVector, kernel = nothing)
+function add_point!(alg::StreamKmeans, X::AbstractVector, kernel = nothing)
     b = size(X, 1)
     for i = 1:b
         val = find_nearest_center(X[i], Z, kernel)[2]

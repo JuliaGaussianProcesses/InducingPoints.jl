@@ -49,7 +49,7 @@ function GreedyIP(
     m > 0 || error("Number of inducing points should be positive")
     S > 0 || error("Size of the minibatch should be positive")
     σ² > 0 || error("Noise should be positive")
-    Z = greedy_ip(X, y, kernel, m, S, σ², obsdim)
+    Z = greedy_ip(X, y, kernel, m, S, σ²)
     return GreedyIP(
         S,
         m,
@@ -60,7 +60,7 @@ end
 Base.show(io::IO, alg::GreedyIP) =
     print(io, "Greedy Selection of Inducing Points")
 
-function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, σ², )
+function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, σ²)
     T = eltype(X)
     N = size(X, 1)
     Z = Vector{eltype(X)}() #Initialize array of IPs

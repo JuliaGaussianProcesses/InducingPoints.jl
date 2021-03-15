@@ -3,7 +3,7 @@ module InducingPoints
 export AbstractInducingPoints
 export KmeansIP
 export OptimIP
-export Webscale, OIPS, Kmeans, kDPP, StdDPP, SeqDPP, Greedy, UniformSampling, UniGrid
+export Webscale, OIPS, KmeansIP, kDPP, StdDPP, SeqDPP, GreedyIP, RandomSubset, UniformGrid, StreamKmeans
 export init, update!
 
 using StatsBase: Weights, sample
@@ -57,12 +57,12 @@ include("optimIP.jl")
 include("seqdpp.jl")
 include("kdpp.jl")
 include("stddpp.jl")
-include("streamingkmeans.jl")
+include("streamkmeans.jl")
 include("webscale.jl")
 include("oips.jl")
 include("kmeans.jl")
-include("greedy.jl")
-include("uniform.jl")
+include("greedyip.jl")
+include("randomsubset.jl")
 include("unigrid.jl")
 
 
