@@ -4,11 +4,11 @@ using Documenter
 makedocs(;
     modules=[InducingPoints],
     authors="Theo Galy-Fajou <theo.galyfajou@gmail.com> and contributors",
-    repo="https://github.com/theogf/InducingPoints.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/JuliaGaussianProcesses/InducingPoints.jl/blob/{commit}{path}#L{line}",
     sitename="InducingPoints.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://theogf.github.io/InducingPoints.jl",
+        canonical="https://JuliaGaussianProcesses.github.io/InducingPoints.jl",
         assets=String[],
     ),
     pages=[
@@ -17,5 +17,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/theogf/InducingPoints.jl",
+    repo="github.com/JuliaGaussianProcesses/InducingPoints.jl",
 )
