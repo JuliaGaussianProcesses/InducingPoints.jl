@@ -19,13 +19,13 @@ Given a set of features `X` you can get a point selection by calling
 ```
 
 The Offline options are:
-- [KmeansIP](@ref) : use the k-means algorithm to select centroids minimizing the square distance with the dataset.
+- [`KmeansIP`](@ref) : use the k-means algorithm to select centroids minimizing the square distance with the dataset.
 The seeding is done via `k-means++`.
 Note that the inducing points are not going to be a subset of the data
-- [kDPP](@ref) : sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`
-- [StdDPP](@ref) : sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`
-- [Uniform](@ref) : sample randomly `k` points from the data set uniformly.
-- [Greedy](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way)
+- [`kDPP`](@ref) : sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`
+- [`StdDPP`](@ref) : sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`
+- [`Uniform`](@ref) : sample randomly `k` points from the data set uniformly.
+- [`Greedy`](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way)
 ## Online Inducing Points Selection
 
 Online selection is a bit more involved.
@@ -46,10 +46,11 @@ The Online options are:
 - [SeqDPP](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditionned on the existing inducing points.
 - [StreamOnline](@ref) : An online version of k-means.
 
-
+## Index 
 ```@index
 ```
 
+## API
 ```@autodocs
 Modules = [InducingPoints]
 ```
