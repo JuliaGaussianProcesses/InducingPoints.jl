@@ -24,8 +24,8 @@ export init, update!
 const jitt = 1e-5
 
 """
-     inducingpoints(alg::AbstractInducingPointsSelectionAlg, X::AbstractVector; kwargs...)
-     inducingpoints(alg::AbstractInducingPointsSelectionAlg, X::AbstractMatrix; obsdim=1, kwargs...)
+     inducingpoints([rng::AbstractRNG}, alg::AbstractInducingPointsSelectionAlg, X::AbstractVector; kwargs...)
+     inducingpoints([rng::AbstractRNG], alg::AbstractInducingPointsSelectionAlg, X::AbstractMatrix; obsdim=1, kwargs...)
 
 Select inducing points according to the algorithm `alg`.
 """
@@ -44,8 +44,12 @@ abstract type OnlineInducingPointsSelectionAlg <: AIPSA end
 const OnIPSA = OnlineInducingPointsSelectionAlg
 
 ## Wrapper for matrices
-function inducingpoints(alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+function inducingpoints(rng::AbstractRNG, alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
      return inducingpoints(alg, vec_of_vecs(X; obsdim=obsdim), kwargs...)
+end
+
+function inducingpoints(alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+     return inducingpoints(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
 end
 
 init(Z::OnIPSA, X::AbstractVector) = init(Z, X)

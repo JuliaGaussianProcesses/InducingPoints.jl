@@ -1,10 +1,9 @@
 """
-    UniformSampling(X::AbstractVector, m::Int; weights)
-    UniformSampling(X::AbstractMatrix, m::int; weights, obsdim = 1)
+    RandomSubset(X::AbstractVector, m::Int; weights)
 
 Uniform sampling of a subset of the data.
 """
-struct UniformSampling{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
+struct RandomSubset{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
     k::Int
     Z::TZ
 end
