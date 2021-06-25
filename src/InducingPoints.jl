@@ -16,7 +16,11 @@ export AbstractInducingPointsSelectionAlg
 
 export inducingpoints
 
-export KmeansIP
+## Offline algorithms
+export KmeansAlg
+export RandomSubset
+
+## Online algorithms
 export OptimIP
 export Webscale, OIPS, KmeansIP, kDPP, StdDPP, SeqDPP, GreedyIP, RandomSubset, UniformGrid, StreamKmeans
 export init, update!
@@ -64,6 +68,7 @@ remove_point!(::OnIP, args...) = nothing
 
 ## Offline algorithms
 include(joinpath("offline", "kmeans.jl"))
+include(joinpath("offline", "randomsubset.jl"))
 include("seqdpp.jl")
 include("kdpp.jl")
 include("stddpp.jl")
@@ -71,7 +76,6 @@ include("streamkmeans.jl")
 include("webscale.jl")
 include("oips.jl")
 include("greedyip.jl")
-include("randomsubset.jl")
 include("unigrid.jl")
 
 
