@@ -1,29 +1,28 @@
 """
-    kDPP(X::AbstractVector, m::Int, kernel::Kernel)
-    kDPP(X::AbstractMatrix, m::Int, kernel::Kernel; obsdim::Int = 1)
+    kDPP(m::Int, kernel::Kernel)
 
 k-DPP (Determinantal Point Process) will return a subset of `X` of size `m`,
 according to DPP probability
 """
-struct kDPP{S,TZ<:AbstractVector{S},K<:Kernel} <: OffIP{S,TZ}
-    k::Int
+struct kDPP{K<:Kernel} <: OffIPSA
+    m::Int
     kernel::K
-    Z::TZ
+    function kDPP(m::Int, kernel::K) where {K<:Kernel}
+		m > 0 || throw(ArgumentError("The number of inducing points m should be positive"))
+        new{K}(m, kernel)
+    end
 end
 
-function kDPP(X::AbstractMatrix, m::Int, kernel::Kernel; obsdim::Int = 1)
-    kDPP(KernelFunctions.vec_of_vecs(X, obsdim=obsdim), m, kernel)
-end
 
-function kDPP(X::AbstractVector, m::Int, kernel::Kernel)
-    Z = kddp_ip(X, m, kernel)
+function incudingpoints(rng::AbstractRNG, alg::kDPP, X::AbstractVector; kwargs...)
+    return kddp_ip(rng, X, alg.m, alg.kernel)
     return kDPP(m, kernel, Z)
 end
 
 Base.show(io::IO, alg::kDPP) = print(io, "k-DPP selection of inducing points")
 
-function kdpp_ip(X::AbstractVector, m::Int, kernel::Kernel)
-    N = size(X, 1)
+function kdpp_ip(rng::AbstractRNG, X::AbstractVector, m::Int, kernel::Kernel)
+    nSamples = length(X)
     Z = Vector{eltype(X)}()
     i = rand(1:N)
     push!(Z, Vector(X[i]))

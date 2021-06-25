@@ -8,7 +8,7 @@ The size of the returned `Z` is not fixed
 struct StdDPP{K<:Kernel} <: OffIPSA
     kernel::K
     function StdDPP(kernel::K) where {K<:Kernel}
-        new{K}(m, kernel)
+        new{K}(kernel)
     end
 end
 
