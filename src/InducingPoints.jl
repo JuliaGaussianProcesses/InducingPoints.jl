@@ -1,29 +1,33 @@
 module InducingPoints
 
-using StatsBase: Weights, sample
-using DeterminantalPointProcesses
-using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
+import Base: rand, show
+
+using AbstractGPs
 using Clustering: kmeans!
-using Distances
 using DataStructures
+using DeterminantalPointProcesses: DPP
+using Distances
 using KernelFunctions
 using KernelFunctions: ColVecs, RowVecs, vec_of_vecs
+using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
 using Random: rand, bitrand, AbstractRNG, MersenneTwister
-import Base: rand, show
+using StatsBase: Weights, sample
 
 
 export AbstractInducingPointsSelectionAlg
+
+## Generic function
 
 export inducingpoints
 
 ## Offline algorithms
 export KmeansAlg
 export RandomSubset
-export StdDPP
+export StdDPP, kDPP
+export Greedy
 
 ## Online algorithms
-export OptimIP
-export Webscale, OIPS, KmeansIP, kDPP, SeqDPP, GreedyIP, UniformGrid, StreamKmeans
+export Webscale, OIPS, SeqDPP, UniformGrid, StreamKmeans
 export init, update!
 
 const jitt = 1e-5

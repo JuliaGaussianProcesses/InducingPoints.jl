@@ -13,8 +13,10 @@ struct StdDPP{K<:Kernel} <: OffIPSA
 end
 
 function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kwargs...)
-    K = Symmetric(kernelmatrix(alg.kernel, X) + jitt * I)
-    dpp = DPP(K)
-    samp = rand(rng, dpp, 1)[1]
+    dpp = DPP(kernel, X)
+    samp = rand(rng, dpp)
+    while isempty(samp) # Sample from the DPP until there is a non-empty set
+        samp = rand(rng, dpp)
+    end
     return X[samp]
 end

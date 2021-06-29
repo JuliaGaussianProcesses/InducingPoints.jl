@@ -1,3 +1,4 @@
+using Core: Argument
 """
     GreedyIP(X::AbstractVector, m::Int, y, s, kernel, σ²)
     GreedyIP(X::AbstractMatrix, m::Int, y, s, kernel, σ²; obsdim = 1)
@@ -13,84 +14,59 @@ Algorithm loops over minibatches of data and select the best ELBO improvement.
 
 [1] Titsias, M. Variational Learning of Inducing Variables in Sparse Gaussian Processes. Aistats 5, 567–574 (2009).
 """
-mutable struct GreedyIP{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
+struct Greedy <: OffIPSA
+    m::Int # Number of inducing points
     s::Int
-    k::Int
-    Z::TZ
+    function Greedy(m, s)
+        m > 0 || throw(ArgumentError("Number of inducing points should be positive"))
+        s > 0 || throw(ArugmentError("Size of the minibatch should be positive"))
+        new(m, s)
+    end
 end
 
-function GreedyIP(
-    X::AbstractMatrix,
-    m::Int,
-    y::AbstractVector,
-    s::Int,
-    kernel::Kernel,
-    σ²::Real;
-    obsdim::Int = 1,
-    )
-    GreedyIP(
-        KernelFunctions.vec_of_vecs(X, obsdim=obsdim),
-        m::Int,
-        y::AbstractVector,
-        s::Int,
-        kernel::Kernel,
-        σ²::Real,
-    )
+
+
+function inducingpoints(rng::AbstractRNG, alg::Greedy, X::AbstractVector; y, kernel::Kernel, noise::Real, kwargs...)
+    noise > 0 || throw(ArgumentError("Noise should be positive"))
+    length(X) == length(y) || throw(ArgumentError("y and X have different lengths"))
+    greedy_ip(X, y, kernel, alg.m, alg.s, noise)
 end
 
-function GreedyIP(
-    X::AbstractVector,
-    m::Int,
-    y::AbstractVector,
-    S::Int,
-    kernel::Kernel,
-    σ²::Real,
-)
-    m > 0 || error("Number of inducing points should be positive")
-    S > 0 || error("Size of the minibatch should be positive")
-    σ² > 0 || error("Noise should be positive")
-    Z = greedy_ip(X, y, kernel, m, S, σ²)
-    return GreedyIP(
-        S,
-        m,
-        Z
-    )
-end
 
 Base.show(io::IO, alg::GreedyIP) =
     print(io, "Greedy Selection of Inducing Points")
 
 function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, σ²)
-    T = eltype(X)
-    N = size(X, 1)
-    Z = Vector{eltype(X)}() #Initialize array of IPs
+    T = eltype(X) # Type of one sample
+    N = length(X) # Number of samples
+    Z = T[] #Initialize empty array of IPs
     IP_set = Set{Int}() # Keep track of selected points
     i = rand(1:N) # Take a random initial point
-    push!(Z, Vector(X[i])); push!(IP_set, i)
-    for v = 2:m
+    f = GP(kernel)
+    push!(Z, X[i]); push!(IP_set, i)
+    for v in 2:m
         # Evaluate on a subset of the points of a maximum size of 1000
-        X_te = sample(1:N, min(1000, N), replace = false)
-        X_te_set = Set(X_te)
-        i = 0
+        X_test = Set(sample(1:N, min(1000, N), replace = false))
+        best_i = 0
         best_L = -Inf
         # Parse over random points of this subset
-        new_candidates = collect(setdiff(X_te_set, IP_set))
+        new_candidates = collect(setdiff(X_test, IP_set))
+        # Sample a minibatch of candidates
         d = sample(
-            collect(setdiff(X_te_set, IP_set)),
-            min(S, length(new_candidates)),
+            collect(setdiff(X_test, IP_set)),
+            min(s, length(new_candidates)),
             replace = false,
         )
-        for j in d
+        for j in d # Loop over every sample and evaluate the elbo addition with each new sample
             new_Z = vcat(Z, X[j])
-            L = elbo(new_Z, X[X_sub], y[X_sub], kernel, σ²)
+            L = elbo(gp(X[X_sub]), y[X_sub], gp(new_Z))
             if L > best_L
-                i = j
+                best_i = j
                 best_L = L
             end
         end
-        @info "Found best L :$best_L $v/$m"
-        push!(Z, Vector(X[i]))
-        push!(IP_set, i)
+        push!(Z, X[best_i])
+        push!(IP_set, best_i)
     end
     return Z
 end
