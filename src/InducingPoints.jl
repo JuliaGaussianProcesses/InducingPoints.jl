@@ -63,27 +63,22 @@ end
 
 init(Z::OnIPSA, X::AbstractVector) = init(Z, X)
 
-update!(Z::OnIP, X::AbstractMatrix, args...; obsdim = 1) = init(Z, vec_of_vecs(X, obsdim = obsdim), args...)
-
-update!(Z::OnIP, X::AbstractVector, args...) = add_point!(Z, X, args...)
-
-add_point!(Z::OnIP, X::AbstractVector, ::Kernel) = add_point!(Z, X)
-
-remove_point!(::OnIP, args...) = nothing
+update!(Z::OnIP, X::AbstractMatrix; obsdim = 1, kwargs...) = init(Z, vec_of_vecs(X, obsdim = obsdim); kwargs...)
+update!(Z::OnIP, X::AbstractVector; kwargs...) = add_point!(Z, X; kwargs...) # Standard use is update!
 
 ## Offline algorithms
 include(joinpath("offline", "kmeans.jl"))
 include(joinpath("offline", "randomsubset.jl"))
 include(joinpath("offline", "stddpp.jl"))
-include("kdpp.jl")
-include("greedyip.jl")
+include(joinpath("offline", "kdpp.jl"))
+include(joinpath("offline", "greedyip.jl"))
 
 ## Online algorithms
-include("seqdpp.jl")
-include("streamkmeans.jl")
-include("webscale.jl")
-include("oips.jl")
-include("unigrid.jl")
+include(joinpath("online", "seqdpp.jl"))
+include(joinpath("online", "streamkmeans.jl"))
+include(joinpath("online", "webscale.jl"))
+include(joinpath("online", "oips.jl"))
+include(joinpath("online", "unigrid.jl"))
 
 
 

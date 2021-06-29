@@ -42,7 +42,7 @@ function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, �
     Z = T[] #Initialize empty array of IPs
     IP_set = Set{Int}() # Keep track of selected points
     i = rand(1:N) # Take a random initial point
-    f = GP(kernel)
+    f = AbstractGPs.GP(kernel)
     push!(Z, X[i]); push!(IP_set, i)
     for v in 2:m
         # Evaluate on a subset of the points of a maximum size of 1000
@@ -59,7 +59,7 @@ function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, �
         )
         for j in d # Loop over every sample and evaluate the elbo addition with each new sample
             new_Z = vcat(Z, X[j])
-            L = elbo(gp(X[X_sub]), y[X_sub], gp(new_Z))
+            L = AbstractGPs.elbo(f(X[X_sub], noise), y[X_sub], f(new_Z))
             if L > best_L
                 best_i = j
                 best_L = L
@@ -71,14 +71,14 @@ function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, �
     return Z
 end
 
-function elbo(Z::AbstractVector, X::AbstractVector, y::AbstractVector, kernel::Kernel, σ²::Real)
-    Knm = kernelmatrix(kernel, X, Z)
-    Kmm = kernelmatrix(kernel, Z) + T(jitt) * I
-    Qff = Knm * (Kmm \ Knm')
-    Kt = kerneldiagmatrix(kernel, X) .+ T(jitt) - diag(Qff)
-    Σ = inv(Kmm) + Knm' * Knm / σ²
-    invQnn = 1/σ² * I - 1/ (σ²)^2 * Knm * inv(Σ) * Knm'
-    logdetQnn = logdet(Σ) + logdet(Kmm)
-    return -0.5 * dot(y, invQnn * y) - 0.5 * logdetQnn -
-           1.0 / (2 * σ²) * sum(Kt)
-end
+# function elbo(Z::AbstractVector, X::AbstractVector, y::AbstractVector, kernel::Kernel, σ²::Real)
+#     Knm = kernelmatrix(kernel, X, Z)
+#     Kmm = kernelmatrix(kernel, Z) + T(jitt) * I
+#     Qff = Knm * (Kmm \ Knm')
+#     Kt = kerneldiagmatrix(kernel, X) .+ T(jitt) - diag(Qff)
+#     Σ = inv(Kmm) + Knm' * Knm / σ²
+#     invQnn = 1/σ² * I - 1/ (σ²)^2 * Knm * inv(Σ) * Knm'
+#     logdetQnn = logdet(Σ) + logdet(Kmm)
+#     return -0.5 * dot(y, invQnn * y) - 0.5 * logdetQnn -
+#            1.0 / (2 * σ²) * sum(Kt)
+# end
