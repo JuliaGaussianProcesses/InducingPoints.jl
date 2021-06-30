@@ -8,11 +8,10 @@ struct kDPP{K<:Kernel} <: OffIPSA
     m::Int
     kernel::K
     function kDPP(m::Int, kernel::K) where {K<:Kernel}
-		m > 0 || throw(ArgumentError("The number of inducing points m should be positive"))
-        new{K}(m, kernel)
+        m > 0 || throw(ArgumentError("The number of inducing points m should be positive"))
+        return new{K}(m, kernel)
     end
 end
-
 
 function incudingpoints(rng::AbstractRNG, alg::kDPP, X::AbstractVector; kwargs...)
     return kddp_ip(rng, X, alg.m, alg.kernel)

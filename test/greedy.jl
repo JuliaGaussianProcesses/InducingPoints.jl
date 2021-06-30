@@ -10,7 +10,7 @@ y = rand(N)
     alg = Greedy(nInd, N)
     @test repr(alg) == "Greedy Selection of Inducing Points"
     AGP.IPModule.init!(alg, X, y, k)
-    @test_throws AssertionError AGP.IPModule.init!(Greedy(N+1, N), X, y, k)
-    @test_throws AssertionError AGP.IPModule.init!(Greedy(nInd, N+1), X, y, k)
+    @test_throws AssertionError AGP.IPModule.init!(Greedy(N + 1, N), X, y, k)
+    @test_throws AssertionError AGP.IPModule.init!(Greedy(nInd, N + 1), X, y, k)
     @test size(alg) == (nInd, D)
 end

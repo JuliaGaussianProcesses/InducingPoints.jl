@@ -16,46 +16,57 @@ Algorithm loops over minibatches of data and select the best ELBO improvement.
 """
 struct Greedy <: OffIPSA
     m::Int # Number of inducing points
-    s::Int
+    s::Int # Minibatch size for selection
     function Greedy(m, s)
         m > 0 || throw(ArgumentError("Number of inducing points should be positive"))
         s > 0 || throw(ArugmentError("Size of the minibatch should be positive"))
-        new(m, s)
+        return new(m, s)
     end
 end
 
-
-
-function inducingpoints(rng::AbstractRNG, alg::Greedy, X::AbstractVector; y, kernel::Kernel, noise::Real, kwargs...)
+function inducingpoints(
+    rng::AbstractRNG,
+    alg::Greedy,
+    X::AbstractVector;
+    y,
+    kernel::Kernel,
+    noise::Real,
+    kwargs...,
+)
     noise > 0 || throw(ArgumentError("Noise should be positive"))
     length(X) == length(y) || throw(ArgumentError("y and X have different lengths"))
-    greedy_ip(X, y, kernel, alg.m, alg.s, noise)
+    return greedy_ip(rng, X, y, kernel, alg.m, alg.s, noise)
 end
 
+Base.show(io::IO, alg::GreedyIP) = print(io, "Greedy Selection of Inducing Points")
 
-Base.show(io::IO, alg::GreedyIP) =
-    print(io, "Greedy Selection of Inducing Points")
-
-function greedy_ip(X::AbstractVector, y::AbstractVector, kernel::Kernel, m, S, σ²)
-    T = eltype(X) # Type of one sample
+function greedy_ip(
+    rng::AbstractRNG,
+    X::AbstractVector,
+    y::AbstractVector,
+    kernel::Kernel,
+    m::Int,
+    s::Int,
+    noise::Real,
+)
     N = length(X) # Number of samples
-    Z = T[] #Initialize empty array of IPs
-    IP_set = Set{Int}() # Keep track of selected points
-    i = rand(1:N) # Take a random initial point
-    f = AbstractGPs.GP(kernel)
-    push!(Z, X[i]); push!(IP_set, i)
-    for v in 2:m
+    i = rand(rng, 1:N) # Take a random initial point
+    Z = [X[i]] # Initialize empty array of IPs
+    IP_set = Set{Int}(i) # Keep track of selected points
+    f = AbstractGPs.GP(kernel) # GP object to compute the elbo
+    for _ in 2:m
         # Evaluate on a subset of the points of a maximum size of 1000
-        X_test = Set(sample(1:N, min(1000, N), replace = false))
+        X_test = Set(sample(rng, 1:N, min(1000, N); replace=false))
         best_i = 0
         best_L = -Inf
         # Parse over random points of this subset
         new_candidates = collect(setdiff(X_test, IP_set))
         # Sample a minibatch of candidates
         d = sample(
+            rng,
             collect(setdiff(X_test, IP_set)),
-            min(s, length(new_candidates)),
-            replace = false,
+            min(s, length(new_candidates));
+            replace=false,
         )
         for j in d # Loop over every sample and evaluate the elbo addition with each new sample
             new_Z = vcat(Z, X[j])
