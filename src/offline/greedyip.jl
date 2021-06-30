@@ -35,10 +35,13 @@ function inducingpoints(
 )
     noise > 0 || throw(ArgumentError("Noise should be positive"))
     length(X) == length(y) || throw(ArgumentError("y and X have different lengths"))
+    if alg.m >= length(X)
+        return edge_case(alg.m, length(X))
+    end
     return greedy_ip(rng, X, y, kernel, alg.m, alg.s, noise)
 end
 
-Base.show(io::IO, alg::GreedyIP) = print(io, "Greedy Selection of Inducing Points")
+Base.show(io::IO, ::GreedyIP) = print(io, "Greedy Selection of Inducing Points")
 
 function greedy_ip(
     rng::AbstractRNG,

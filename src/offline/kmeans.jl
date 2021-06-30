@@ -21,7 +21,7 @@ struct KmeansAlg{Tm,T} <: OffIPSA
     nMarkov::Int
     tol::T
     function KmeansAlg(
-        m::Int, metric::SemiMetric; nMarkov::Int=10, tol::T=1e-3
+        m::Int, metric::SemiMetric=SqEuclidean(); nMarkov::Int=10, tol::T=1e-3
     ) where {T<:Real}
         m > 0 || throw(ArgumentError("The number of inducing points m should be positive"))
         tol > 0 || throw(ArgumentError("The tolerance tol should be positive"))

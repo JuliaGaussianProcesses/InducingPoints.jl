@@ -14,6 +14,9 @@ struct kDPP{K<:Kernel} <: OffIPSA
 end
 
 function incudingpoints(rng::AbstractRNG, alg::kDPP, X::AbstractVector; kwargs...)
+    if alg.m >= length(X)
+        return edge_case(alg.m, length(X))
+    end
     return kddp_ip(rng, X, alg.m, alg.kernel)
 end
 

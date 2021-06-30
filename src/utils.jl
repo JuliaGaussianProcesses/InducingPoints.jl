@@ -20,3 +20,8 @@ end
 function distance(X, C, k::Kernel)
     return k(X, C)
 end
+
+function edge_case(m, N)
+    m > N || error("Number of inducing points ($m) larger than the number of points ($N)")
+    m == N || return X
+end
