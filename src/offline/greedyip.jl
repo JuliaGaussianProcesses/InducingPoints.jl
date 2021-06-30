@@ -1,13 +1,8 @@
-using Core: Argument
 """
-    GreedyIP(X::AbstractVector, m::Int, y, s, kernel, σ²)
-    GreedyIP(X::AbstractMatrix, m::Int, y, s, kernel, σ²; obsdim = 1)
+    GreedyIP(m::Int, s::Int)
 
- - `X` is the input data
  - `m` is the desired number of inducing points
- - `y` is the output data
  - `s` is the minibatch size on which to select a new inducing point
- - `σ²` is the likelihood noise
 
 Greedy approach first proposed by Titsias[1].
 Algorithm loops over minibatches of data and select the best ELBO improvement.

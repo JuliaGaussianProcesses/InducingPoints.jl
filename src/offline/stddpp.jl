@@ -1,9 +1,8 @@
 """
-    StdDPP(X::AbstractMatrix, kernel::Kernel; obsdim::Int = 1)
-    StdDPP(X::AbstractVector, kernel::Kernel)
+    StdDPP(kernel::Kernel)
 
 Standard DPP (Determinantal Point Process) sampling given `kernel`.
-The size of the returned `Z` is not fixed
+The size of the returned `Z` is not fixed (but cannot be empty unlike in a classical DPP)
 """
 struct StdDPP{K<:Kernel} <: OffIPSA
     kernel::K

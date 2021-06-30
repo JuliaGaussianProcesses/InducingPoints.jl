@@ -6,7 +6,7 @@ Adaptive uniform grid based on [1]
 
 [1] Moreno-Muñoz, P., Artés-Rodríguez, A. & Álvarez, M. A. Continual Multi-task Gaussian Processes. (2019).
 """
-struct UniGrid{} <: OnIPSA
+struct UniGrid <: OnIPSA
     m::Int # Number of points per dimension
 end
 

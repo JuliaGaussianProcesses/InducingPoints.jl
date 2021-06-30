@@ -6,37 +6,31 @@ CurrentModule = InducingPoints
 
 InducingPoints.jl aims at providing an easy way to select inducing points locations for Sparse Gaussian Processes both in an online and offline setting.
 
-The point selection is splitted in the online and offline settings.
+The point selection is splitted in the online (`OnIPSA`) and offline settings.
 
-All methods inherit from `AbstractInducingPoints` which acts as a `Vector` of `Vector`s, making it especially compatible with `KernelFunctions.jl`
+All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which can be passed to the different APIs
 
 ## Offline Inducing Points Selection
 
-Given a set of features `X` you can get a point selection by calling
-
-```julia
-    Z = KmeansIP(X, 10, obsdim=1)
-```
-
 The Offline options are:
-- [`KmeansIP`](@ref) : use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data
+- [`KmeansAlg`](@ref) : use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data
 - [`kDPP`](@ref) : sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`
 - [`StdDPP`](@ref) : sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`
 - [`RandomSubset`](@ref) : sample randomly `k` points from the data set uniformly.
-- [`GreedyIP`](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way)
+- [`Greedy`](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way)
 ## Online Inducing Points Selection
 
 Online selection is a bit more involved.
 ```julia
-Z = OIPS()
-Z = init(x_1, args)
+alg = OIPS()
+Z = init(alg, x_1; kwargs...)
 for x in eachbatch(X)
-    update!(Z, x)
+    update!(Z, alg, x; kwargs...)
 end
 ```
 
-After the first instance is created `init` will return a new instance when seeing the first batch of data with the right parametrization.
-After one can simply call `update!` to update the vectors in place.
+With `init`, a first instance of `Z` is created.
+`update!` will then update the vectors in place.
 
 The Online options are:
 - [OIPS](@ref) : A method based on distance between inducing points and data

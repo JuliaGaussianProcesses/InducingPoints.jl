@@ -1,5 +1,5 @@
 """
-  KMeansAlg(m::Int, metric::SemiMetric; nMarkov = 10, tol = 1e-3)
+  KMeansAlg(m::Int, metric::SemiMetric=SqEuclidean(); nMarkov = 10, tol = 1e-3)
 
 k-Means [1] initialization on the data `X` taking `m` inducing points.
 The seeding is computed via [2], `nMarkov` gives the number of MCMC steps for the seeding.
