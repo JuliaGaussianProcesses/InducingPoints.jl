@@ -14,8 +14,9 @@ end
 
 StreamKmeans(k_target::Int) = StreamKmeans(k_target, 0, 0.0, 0)
 
-function init(rng::AbstractRNG, alg::StreamKmeans, X::AbstractVector, kernel=nothing)
-    length(X) > 10 || throw(ArgumentError("The first batch of data should be bigger than 10 samples"))
+function initZ(rng::AbstractRNG, alg::StreamKmeans, X::AbstractVector, kernel=nothing)
+    length(X) > 10 ||
+        throw(ArgumentError("The first batch of data should be bigger than 10 samples"))
     k_efficient = max(1, ceil(Int, (alg.k_target - 15) / 5))
     alg.k_efficient = k_efficient + 10 > length(X) ? 0 : k_efficient
     samp = sample(rng, 1:length(X), alg.k_efficient + 10; replace=false)
@@ -29,7 +30,13 @@ function init(rng::AbstractRNG, alg::StreamKmeans, X::AbstractVector, kernel=not
     return Z
 end
 
-function add_point!(rng::AbstractRNG, Z::AbstractVector,alg::StreamKmeans, X::AbstractVector; kernel=nothing)
+function add_point!(
+    rng::AbstractRNG,
+    Z::AbstractVector,
+    alg::StreamKmeans,
+    X::AbstractVector;
+    kernel=nothing,
+)
     b = length(X) # Size of the input data
     for i in 1:b
         val = find_nearest_center(X[i], Z, kernel)[2]

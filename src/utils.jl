@@ -23,5 +23,13 @@ end
 
 function edge_case(m, N)
     m > N || error("Number of inducing points ($m) larger than the number of points ($N)")
-    m == N || return X
+    return m == N || return X
+end
+
+function to_vec_of_vecs(x::AbstractVector{<:Real}, V)
+    return V(x)
+end
+
+function to_vec_of_vecs(x::AbstractVector, V)
+    return deepcopy(V.(collect.(x)))
 end

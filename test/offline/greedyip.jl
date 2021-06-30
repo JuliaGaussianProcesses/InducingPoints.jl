@@ -13,7 +13,9 @@
     @test length(Z) == (nInd, D)
     @test_throws ArgumentError Greedy(-1, 2)
     @test_throws ArgumentError Greedy(10, -3)
-    @test_throws ArgumentError inducingpoints(alg, X; y=rand(N + 1), kernel=kernel, noise=noise)
+    @test_throws ArgumentError inducingpoints(
+        alg, X; y=rand(N + 1), kernel=kernel, noise=noise
+    )
     @test_throws ArgumentError inducingpoints(alg, X; y=y, kernel=kernel, noise=-1)
     @test_throws Error inducingpoints(Greedy(N + 1, N), X; y=y, kernel=kernel, noise=noise)
 end

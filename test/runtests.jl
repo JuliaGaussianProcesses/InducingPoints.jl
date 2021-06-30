@@ -4,10 +4,14 @@ using KernelFunctions: ColVecs
 using Test
 using Random: seed!
 @testset "InducingPoints.jl" begin
-    for file in readdir("offline"; join=true)
-        include(file)
+    @testset "Offline" begin
+        for file in readdir("offline"; join=true)
+            include(file)
+        end
     end
-    for file in readdir("online"; join=true)
-        include(file)
+    @testset "Online" begin
+        for file in readdir("online"; join=true)
+            include(file)
+        end
     end
 end

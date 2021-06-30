@@ -5,15 +5,9 @@ Sequential sampling via DeterminantalPointProcesses
 """
 struct SeqDPP <: OnIPSA end
 
-Base.show(io::IO, Z::SeqDPP) = print(io, "Sequential DPP")
+Base.show(io::IO, ::SeqDPP) = print(io, "Sequential DPP")
 
-SeqDPP() = SeqDPP(0, Symmetric(Matrix{Float64}(I(0))), [])
-
-function SeqDPP(X::AbstractVector, k::Kernel)
-    return SeqDPP(m, K, Z)
-end
-
-function init(rng::AbstractRNG, ::SeqDPP, X::AbstractVector; kernel::Kernel)
+function initZ(rng::AbstractRNG, ::SeqDPP, X::AbstractVector; kernel::Kernel)
     length(X) > 2 || throw(ArgumentError("First batch should contain at least 3 elements"))
     K = kernelmatrix(kernel, X) + jitt * I
     dpp = DPP(K)

@@ -10,14 +10,14 @@ struct Webscale <: OnIPSA
     v::Vector{Int}
 end
 
-
 function Webscale(m::Int)
     return Webscale(m, zeros(Int, m))
 end
 
-function init(rng::AbstractRNG, alg::Webscale, X::AbstractVector)
-    length(X) >= alg.m ||
-        error("Input data not big enough given desired number of inducing points : $(alg.m)")
+function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector)
+    length(X) >= alg.m || error(
+        "Input data not big enough given desired number of inducing points : $(alg.m)"
+    )
     Z = X[sample(rng, 1:length(X), alg.m; replace=false)]
     return Z
 end

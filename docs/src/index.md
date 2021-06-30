@@ -12,6 +12,11 @@ All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which c
 
 ## Offline Inducing Points Selection
 
+```julia
+alg = KMeansAlg(10)
+Z = inducingpoints(alg, X; kwargs...)
+```
+
 The Offline options are:
 - [`KmeansAlg`](@ref) : use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data
 - [`kDPP`](@ref) : sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`
@@ -23,9 +28,9 @@ The Offline options are:
 Online selection is a bit more involved.
 ```julia
 alg = OIPS()
-Z = init(alg, x_1; kwargs...)
+Z = initZ(alg, x_1; kwargs...)
 for x in eachbatch(X)
-    update!(Z, alg, x; kwargs...)
+    updateZ!(Z, alg, x; kwargs...)
 end
 ```
 

@@ -38,9 +38,9 @@ For example following [this work](https://drive.google.com/file/d/1IPTUBfY_b2WEl
 alg = OIPS(200) # We expect 200 inducing points
 kernel = SqExponential()
 X = [rand(5) for _ in 1:100] # We have some initial data
-Z = init(alg, X; kernel=kernel) # We create an initial vector
+Z = initZ(alg, X; kernel=kernel) # We create an initial vector
 X_new = [rand(5) for _ in 1:50] # We get some new data
-update!(Z, alg, X_new; kernel=kernel) # Points will be acordingly added (or removed!)
+updateZ!(Z, alg, X_new; kernel=kernel) # Points will be acordingly added (or removed!)
 ```
 
 Note that `Z` is directly changed in place.

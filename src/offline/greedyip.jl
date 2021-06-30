@@ -36,7 +36,7 @@ function inducingpoints(
     return greedy_ip(rng, X, y, kernel, alg.m, alg.s, noise)
 end
 
-Base.show(io::IO, ::GreedyIP) = print(io, "Greedy Selection of Inducing Points")
+Base.show(io::IO, ::Greedy) = print(io, "Greedy Selection of Inducing Points")
 
 function greedy_ip(
     rng::AbstractRNG,

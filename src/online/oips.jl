@@ -5,10 +5,10 @@
 Online Inducing Points Selection.
 Method from the paper include reference here.
 """
-struct OnlineIPSelection{T} <: OnIPSA{S,TZ}
+struct OnlineIPSelection{T,Tk} <: OnIPSA
     ρ_accept::T
     ρ_remove::T
-    kmax::Int
+    kmax::Tk
     kmin::Int
     η::T
 end
@@ -23,13 +23,13 @@ function Base.show(io::IO, Z::OIPS)
 end
 
 function OIPS(
-    ρ_accept::Real=0.8; η::Real=0.95, kmax::Real=Inf, ρ_remove::Real=Inf, kmin::Real=10.0
-)
+    ρ_accept::T=0.8; η::Real=0.95, kmax::Real=Inf, ρ_remove::Real=Inf, kmin::Int=10
+) where {T<:Real}
     0.0 <= ρ_accept <= 1.0 || throw(ArgumentError("ρ_accept should be between 0 and 1"))
     0.0 <= η <= 1.0 || throw(ArugmentError("η should be between 0 and 1"))
     ρ_remove = isinf(ρ_remove) ? sqrt(ρ_accept) : ρ_remove
     0.0 <= ρ_remove <= 1.0 || throw(ArgumentError("ρ_remove should be between 0 and 1"))
-    return OIPS(ρ_accept, ρ_remove, kmax, kmin, η)
+    return OIPS{T,typeof(kmax)}(ρ_accept, ρ_remove, kmax, kmin, η)
 end
 
 function OIPS(kmax::Int, η::Real=0.98, kmin::Real=10)
@@ -44,30 +44,38 @@ function OIPS(Z::OIPS, X::AbstractVector)
     return OIPS(Z.ρ_accept, Z.ρ_remove, Z.kmax, Z.kmin, Z.η, 10, Vector.(X[samples]))
 end
 
-function init(rng::AbstractRNG, alg::OIPS, X::AbstractVector; kernel::Kernel, kwargs...)
+function initZ(
+    rng::AbstractRNG,
+    alg::OIPS,
+    X::AbstractVector;
+    kernel::Kernel,
+    arraytype=Vector,
+    kwargs...,
+)
     N = length(X) # Number of samples
-    N >= Z.kmin ||
-        throw(ArgumentError("First batch should have at least $(Z.kmin) samples"))
-    samples = sample(1:N, floor(Int, Z.kmin); replace=false)
-    Z = update!(rng, X[samples], alg, X; kernel=kernel)
+    N >= alg.kmin ||
+        throw(ArgumentError("First batch should have at least $(alg.kmin) samples"))
+    samples = sample(rng, 1:N, floor(Int, alg.kmin); replace=false)
+    global Z = to_vec_of_vecs(X[samples], arraytype)
+    Z = updateZ!(rng, Z, alg, X; kernel=kernel)
     return Z
 end
 
-function update!(
+function updateZ!(
     rng::AbstractRNG, Z::AbstractVector, alg::OIPS, X::AbstractVector; kernel::Kernel
 )
     return add_point!(rng, Z, alg, X, kernel)
 end
 
 function add_point!(
-    rng::AbstractRNG, Z::AbstractVector, alg::OIPS, X::AbstractVector, kernel::Kernel
-)
+    rng::AbstractRNG, Z::AbstractVector{T}, alg::OIPS, X::AbstractVector, kernel::Kernel
+) where {T}
     b = length(X)
     for i in 1:b # Parse all points from X
         kx = kernelmatrix(kernel, [X[i]], Z)
         # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
         if maximum(kx) < alg.ρ_accept # If the biggest correlation is smaller than threshold add point
-            push!(Z, X[i])
+            push!(Z, collect(X[i]))
         end
         while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
             K = kernelmatrix(kernel, Z)

@@ -15,9 +15,11 @@ using StatsBase: Weights, sample
 
 export AbstractInducingPointsSelectionAlg
 
-## Generic function
+## Generic functions
 
 export inducingpoints
+export initZ
+export updateZ!
 
 ## Offline algorithms
 export KmeansAlg
@@ -34,15 +36,7 @@ export Webscale
 
 const jitt = 1e-5
 
-"""
-     inducingpoints([rng::AbstractRNG}, alg::AbstractInducingPointsSelectionAlg, X::AbstractVector; kwargs...)
-     inducingpoints([rng::AbstractRNG], alg::AbstractInducingPointsSelectionAlg, X::AbstractMatrix; obsdim=1, kwargs...)
-
-Select inducing points according to the algorithm `alg`.
-"""
-inducingpoints
-
-abstract type AbstractInducingPoints end
+abstract type AbstractInducingPointsSelectionAlg end
 
 const AIPSA = AbstractInducingPointsSelectionAlg
 
@@ -55,6 +49,14 @@ abstract type OnlineInducingPointsSelectionAlg <: AIPSA end
 const OnIPSA = OnlineInducingPointsSelectionAlg
 
 ## Wrapper for matrices
+"""
+     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractVector; kwargs...)
+     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+
+Select inducing points according to the algorithm `alg`.
+"""
+inducingpoints
+
 function inducingpoints(
     rng::AbstractRNG, alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...
 )
@@ -70,24 +72,40 @@ function inducingpoints(alg::AIPSA, X::AbstractVector; kwargs...)
     return inducingpoints(GLOBAL_RNG, alg, X; kwargs...)
 end
 
-
 ## Online IP selection functions 
 """
+     initZ([rng::AbstractRNG], alg::OnIPSA, X::AbstractVector; kwargs...)
+     initZ([rng::AbstractRNG], alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
 
+Select inducing points according to the algorithm `alg` and return a Vector of Vector.
+"""
+initZ
+
+initZ(Z::OnIPSA, X::AbstractVector; kwargs...) = initZ(GLOBAL_RNG, Z, X; kwargs...)
+
+function initZ(alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+    return initZ(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
+end
+
+function initZ(rng::AbstractRNG, alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+    return initZ(rng, vec_of_vecs(X; obsdim=obsdim), X; kwargs...)
+end
 
 """
-init(Z::OnIPSA, X::AbstractVector; kwargs...) = init(GLOBAL_RNG, Z, X; kwargs...)
+    updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
 
-function init(alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
-     init(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
+Update inducing points `Z` with data `X` and algorithm `alg`
+"""
+updateZ!
+
+function updateZ!(Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
+    return updateZ!(GLOBAL_RNG, Z, alg, X; kwargs...)
 end
-
-function init(rng::AbstractRNG, alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
-    return init(rng, vec_of_vecs(X; obsdim=obsdim), X; kwargs...)
+function updateZ!(
+    rng::AbstractRNG, Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...
+)
+    return add_point!(rng, Z, alg, X; kwargs...)
 end
-
-update!(Z::AbstractVector, alg::OnIP, X::AbstractVector; kwargs...) = update!(GLOBAL_RNG, Z, alg, X; kwargs...)
-update!(rng::AbstractRNG, Z::AbstractVector, alg::OnIP, X::AbstractVector; kwargs...) = add_point!(rng, Z, alg, X; kwargs...)
 
 ## Offline algorithms
 include(joinpath("offline", "kmeans.jl"))

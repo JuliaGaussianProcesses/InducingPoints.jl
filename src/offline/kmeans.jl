@@ -25,17 +25,16 @@ struct KmeansAlg{Tm,T} <: OffIPSA
     ) where {T<:Real}
         m > 0 || throw(ArgumentError("The number of inducing points m should be positive"))
         tol > 0 || throw(ArgumentError("The tolerance tol should be positive"))
-        return new{T}(m, metric, nMarkov, tol)
+        return new{typeof(metric),T}(m, metric, nMarkov, tol)
     end
 end
 
 function inducingpoints(
     rng::AbstractRNG, alg::KmeansAlg, X::AbstractVector; weights=nothing, kwargs...
 )
-    alg.m > length(X) && error(
-        "Number of inducing points larger than the input collection size ($(alg.m) > $(length(X))",
-    )
-    alg.m == length(X) && return X
+    if alg.m >= length(X)
+        return edge_case(alg.m, length(X))
+    end
     return kmeans_ip(
         rng, X, alg.m, alg.metric; nMarkov=alg.nMarkov, weights=weights, tol=alg.tol
     )

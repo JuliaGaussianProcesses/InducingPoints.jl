@@ -12,7 +12,7 @@ end
 
 Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.K).")
 
-function init(
+function initZ(
     ::AbstractRNG,
     alg::UniGrid,
     X::Union{AbstractVector{<:Real},AbstractVector{<:AbstractVector{<:Real}}},
@@ -25,7 +25,7 @@ function init(
     return Z
 end
 
-function add_point!(::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector)
+function updateZ!(::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector)
     ndim = length(Z)
     new_bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
     map!(Z, Z, new_bounds) do Z_d, new_b
