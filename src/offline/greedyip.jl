@@ -14,7 +14,7 @@ struct Greedy <: OffIPSA
     s::Int # Minibatch size for selection
     function Greedy(m, s)
         m > 0 || throw(ArgumentError("Number of inducing points should be positive"))
-        s > 0 || throw(ArugmentError("Size of the minibatch should be positive"))
+        s > 0 || throw(ArgumentError("Size of the minibatch should be positive"))
         return new(m, s)
     end
 end
@@ -31,7 +31,7 @@ function inducingpoints(
     noise > 0 || throw(ArgumentError("Noise should be positive"))
     length(X) == length(y) || throw(ArgumentError("y and X have different lengths"))
     if alg.m >= length(X)
-        return edge_case(alg.m, length(X))
+        return edge_case(alg.m, length(X), X)
     end
     return greedy_ip(rng, X, y, kernel, alg.m, alg.s, noise)
 end
@@ -49,7 +49,7 @@ function greedy_ip(
 )
     N = length(X) # Number of samples
     i = rand(rng, 1:N) # Take a random initial point
-    Z = [X[i]] # Initialize empty array of IPs
+    Z = collect.(X[i:i]) # Initialize empty array of IPs
     IP_set = Set{Int}(i) # Keep track of selected points
     f = AbstractGPs.GP(kernel) # GP object to compute the elbo
     for _ in 2:m
@@ -67,8 +67,8 @@ function greedy_ip(
             replace=false,
         )
         for j in d # Loop over every sample and evaluate the elbo addition with each new sample
-            new_Z = vcat(Z, X[j])
-            L = AbstractGPs.elbo(f(X[X_sub], noise), y[X_sub], f(new_Z))
+            new_Z = vcat(Z, X[j:j])
+            L = AbstractGPs.elbo(f(X[collect(X_test)], noise), y[collect(X_test)], f(new_Z))
             if L > best_L
                 best_i = j
                 best_L = L

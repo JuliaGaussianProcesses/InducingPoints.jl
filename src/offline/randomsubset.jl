@@ -26,7 +26,7 @@ function inducingpoints(
     samp = if isnothing(weights)
         sample(rng, 1:N, m; replace=false)
     else
-        sample(rng, 1:N, m; replace=false, weights=weights)
+        wsample(rng, 1:N, m, weights; replace=false)
     end
     return X[samp]
 end

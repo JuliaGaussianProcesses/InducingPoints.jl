@@ -60,14 +60,14 @@ inducingpoints
 function inducingpoints(
     rng::AbstractRNG, alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...
 )
-    return inducingpoints(rng, alg, vec_of_vecs(X; obsdim=obsdim), kwargs...)
+    return inducingpoints(rng, alg, vec_of_vecs(X; obsdim=obsdim); kwargs...)
 end
 
 function inducingpoints(alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
     return inducingpoints(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
 end
 
-## Wrapper for rng generator
+## Wrapper for the RNG
 function inducingpoints(alg::AIPSA, X::AbstractVector; kwargs...)
     return inducingpoints(GLOBAL_RNG, alg, X; kwargs...)
 end
@@ -101,6 +101,7 @@ updateZ!
 function updateZ!(Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
     return updateZ!(GLOBAL_RNG, Z, alg, X; kwargs...)
 end
+# Default behavior is to simply add points
 function updateZ!(
     rng::AbstractRNG, Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...
 )

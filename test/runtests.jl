@@ -1,4 +1,5 @@
 using InducingPoints
+using Distances
 using KernelFunctions
 using KernelFunctions: ColVecs
 using Test

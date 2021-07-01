@@ -1,5 +1,5 @@
 """
-  KMeansAlg(m::Int, metric::SemiMetric=SqEuclidean(); nMarkov = 10, tol = 1e-3)
+    KmeansAlg(m::Int, metric::SemiMetric=SqEuclidean(); nMarkov = 10, tol = 1e-3)
 
 k-Means [1] initialization on the data `X` taking `m` inducing points.
 The seeding is computed via [2], `nMarkov` gives the number of MCMC steps for the seeding.
@@ -33,7 +33,7 @@ function inducingpoints(
     rng::AbstractRNG, alg::KmeansAlg, X::AbstractVector; weights=nothing, kwargs...
 )
     if alg.m >= length(X)
-        return edge_case(alg.m, length(X))
+        return edge_case(alg.m, length(X), X)
     end
     return kmeans_ip(
         rng, X, alg.m, alg.metric; nMarkov=alg.nMarkov, weights=weights, tol=alg.tol
@@ -41,7 +41,7 @@ function inducingpoints(
 end
 
 function Base.show(io::IO, alg::KmeansAlg)
-    return print(io, "k-Means Selection of Inducing Points (k : $(alg.k))")
+    return print(io, "k-Means Selection of Inducing Points (m : $(alg.m))")
 end
 
 #Return K inducing points from X, m being the number of Markov iterations for the seeding
@@ -56,7 +56,7 @@ function kmeans_ip(
 )
     C = kmeans_seeding(rng, X, nC, metric, nMarkov)
     C = reduce(hcat, C)
-    kmeans!(X, C; weights=weights, tol=tol, distance=metric)
+    kmeans!(reduce(hcat, X), C; weights=weights, tol=tol, distance=metric)
     return ColVecs(C)
 end
 
@@ -71,7 +71,7 @@ function kmeans_seeding(
     nSamples = length(X) # Number of input samples
     # Preprocessing, 
     init = rand(rng, 1:nSamples) # Sample first random center
-    C = [X[init]] # Initialize the collection of centroids
+    C = collect.(X[init:init]) # Initialize the collection of centroids
     q = vec(pairwise(metric, X, C)) # Create the pairwise values between the data and the first centroid
     q = Weights(q / sum(q) .+ 1.0 / (2 * nSamples), 1) # Create weights to work with
     for i in 2:nC
@@ -90,7 +90,3 @@ function kmeans_seeding(
     return C
 end
 
-#Compute the minimum distance between a vector and a collection of vectors
-function mindistance(metric::SemiMetric, x::AbstractVector, C::AbstractMatrix)#Point to look for, collection of centers, number of centers computed
-    return minimum(evaluate(metric, c, x) for c in C)
-end

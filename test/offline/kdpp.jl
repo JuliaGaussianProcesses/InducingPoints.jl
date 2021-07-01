@@ -6,9 +6,9 @@
     kernel = SqExponentialKernel()
     X = ColVecs(rand(D, N))
     alg = kDPP(nInd, kernel)
-    @test repr(alg) == "kDPP selection of inducing points"
+    @test repr(alg) == "k-DPP selection of inducing points"
     Z = inducingpoints(alg, X)
     @test length(Z) == nInd
     @test_throws ArgumentError kDPP(-1, kernel)
-    @test_throws Error inducingpoints(kDPP(100, kernel), X)
+    @test_throws ErrorException inducingpoints(kDPP(100, kernel), X)
 end

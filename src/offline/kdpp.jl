@@ -13,11 +13,11 @@ struct kDPP{K<:Kernel} <: OffIPSA
     end
 end
 
-function incudingpoints(rng::AbstractRNG, alg::kDPP, X::AbstractVector; kwargs...)
+function inducingpoints(rng::AbstractRNG, alg::kDPP, X::AbstractVector; kwargs...)
     if alg.m >= length(X)
-        return edge_case(alg.m, length(X))
+        return edge_case(alg.m, length(X), X)
     end
-    return kddp_ip(rng, X, alg.m, alg.kernel)
+    return kdpp_ip(rng, X, alg.m, alg.kernel)
 end
 
 Base.show(io::IO, ::kDPP) = print(io, "k-DPP selection of inducing points")

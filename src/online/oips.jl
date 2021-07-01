@@ -1,13 +1,12 @@
 """
-    OIPS(ρ_accept=0.8, opt= ADAM(0.001); η = 0.95, kmax = Inf, kmin = 10, ρ_remove = Inf )
-    OIPS(kmax, η = 0.98, kmin = 10)
+    OIPS(ρ_accept=0.8; η=0.95, kmax=Inf, kmin=10, ρ_remove=Inf)
+    OIPS(kmax, η=0.98, kmin=10)
 
 Online Inducing Points Selection.
 Method from the paper include reference here.
 """
-struct OnlineIPSelection{T,Tk} <: OnIPSA
-    ρ_accept::T
-    ρ_remove::T
+struct OnlineIPSelection{T,Tv<:AbstractVector{T},Tk} <: OnIPSA
+    ρs::Tv # Vector of two elements corresponding to ρ_accept and ρ_remove
     kmax::Tk
     kmin::Int
     η::T
@@ -15,33 +14,29 @@ end
 
 const OIPS = OnlineIPSelection
 
-function Base.show(io::IO, Z::OIPS)
+function Base.show(io::IO, alg::OIPS)
     return print(
         io,
-        "Online Inducing Point Selection (ρ_in : $(Z.ρ_accept), ρ_out : $(Z.ρ_remove), kmax : $(Z.kmax))",
+        "Online Inducing Point Selection (ρ_accept : $(alg.ρs[1]), ρ_remove : $(alg.ρs[2]), kmax : $(alg.kmax))",
     )
 end
 
 function OIPS(
-    ρ_accept::T=0.8; η::Real=0.95, kmax::Real=Inf, ρ_remove::Real=Inf, kmin::Int=10
-) where {T<:Real}
+    ρ_accept::Real=0.8; η::Real=0.95, kmax::Real=Inf, ρ_remove::Real=Inf, kmin::Int=10
+)
     0.0 <= ρ_accept <= 1.0 || throw(ArgumentError("ρ_accept should be between 0 and 1"))
-    0.0 <= η <= 1.0 || throw(ArugmentError("η should be between 0 and 1"))
+    0.0 <= η <= 1.0 || throw(ArgumentError("η should be between 0 and 1"))
     ρ_remove = isinf(ρ_remove) ? sqrt(ρ_accept) : ρ_remove
     0.0 <= ρ_remove <= 1.0 || throw(ArgumentError("ρ_remove should be between 0 and 1"))
-    return OIPS{T,typeof(kmax)}(ρ_accept, ρ_remove, kmax, kmin, η)
+    T = promote_type(typeof(ρ_accept), typeof(ρ_remove), typeof(η))
+    ρs = T[ρ_accept, ρ_remove]
+    return OIPS(ρs, kmax, kmin, T(η))
 end
 
-function OIPS(kmax::Int, η::Real=0.98, kmin::Real=10)
+function OIPS(kmax::Int, η::T=0.98, kmin::Real=10) where {T<:Real}
     kmax > 0 || throw(ArgumentError("kmax should be bigger than 0"))
-    0.0 <= η <= 1.0 || throw(ArugmentError("η should be between 0 and 1"))
-    return OIPS(0.95, sqrt(0.95), kmax, kmin, η)
-end
-function OIPS(Z::OIPS, X::AbstractVector)
-    N = size(X, 1)
-    N >= Z.kmin || error("First batch should have at least $(Z.kmin) samples")
-    samples = sample(1:N, floor(Int, Z.kmin); replace=false)
-    return OIPS(Z.ρ_accept, Z.ρ_remove, Z.kmax, Z.kmin, Z.η, 10, Vector.(X[samples]))
+    0.0 <= η <= 1.0 || throw(ArgumentError("η should be between 0 and 1"))
+    return OIPS(T[0.95, sqrt(0.95)], kmax, kmin, η)
 end
 
 function initZ(
@@ -49,20 +44,26 @@ function initZ(
     alg::OIPS,
     X::AbstractVector;
     kernel::Kernel,
-    arraytype=Vector,
+    arraytype=Vector{Float64},
     kwargs...,
 )
     N = length(X) # Number of samples
     N >= alg.kmin ||
         throw(ArgumentError("First batch should have at least $(alg.kmin) samples"))
     samples = sample(rng, 1:N, floor(Int, alg.kmin); replace=false)
-    global Z = to_vec_of_vecs(X[samples], arraytype)
+    Z = to_vec_of_vecs(X[samples], arraytype)
+    # Z = collect.(X[samples])
     Z = updateZ!(rng, Z, alg, X; kernel=kernel)
     return Z
 end
 
 function updateZ!(
-    rng::AbstractRNG, Z::AbstractVector, alg::OIPS, X::AbstractVector; kernel::Kernel
+    rng::AbstractRNG,
+    Z::AbstractVector,
+    alg::OIPS,
+    X::AbstractVector;
+    kernel::Kernel,
+    kwargs...,
 )
     return add_point!(rng, Z, alg, X, kernel)
 end
@@ -72,20 +73,20 @@ function add_point!(
 ) where {T}
     b = length(X)
     for i in 1:b # Parse all points from X
-        kx = kernelmatrix(kernel, [X[i]], Z)
+        kx = kernelmatrix(kernel, X[i:i], copy(Z))
         # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
-        if maximum(kx) < alg.ρ_accept # If the biggest correlation is smaller than threshold add point
-            push!(Z, collect(X[i]))
+        if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point
+            push!(Z, X[i])
         end
         while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
-            K = kernelmatrix(kernel, Z)
+            K = kernelmatrix(kernel, copy(Z))
             m = maximum(K - Diagonal(K))
-            alg.ρ_remove = alg.η * m
+            alg.ρs[2] = alg.η * m
             remove_point!(rng, Z, alg, K)
-            if alg.ρ_remove < alg.ρ_accept # Readapt the thresholds
-                alg.ρ_accept = alg.η * alg.ρ_remove
+            if alg.ρs[2] < alg.ρs[1] # Readapt the thresholds
+                alg.ρs[1] = alg.η * alg.ρs[2]
             end
-            @info "ρ_accept reset to : $(alg.ρ_accept)"
+            @info "ρ_accept reset to : $(alg.ρs[1])"
         end
     end
     return Z
@@ -93,13 +94,13 @@ end
 
 function remove_point!(rng::AbstractRNG, Z::AbstractVector, alg::OIPS, K::AbstractMatrix)
     if length(Z) > alg.kmin # Only remove points if the minimum is not reached
-        overlapcount = (x -> count(x .> alg.ρ_remove)).(eachrow(K))
+        overlapcount = (x -> count(x .> alg.ρs[2])).(eachrow(K))
         removable = SortedSet(findall(x -> x > 1, overlapcount))
         toremove = []
         c = 0
         while !isempty(removable) && length(Z) > alg.kmin
             i = sample(rng, collect(removable), Weights(overlapcount[collect(removable)]))
-            connected = findall(x -> x > alg.ρ_remove, K[i, :])
+            connected = findall(x -> x > alg.ρs[2], K[i, :])
             overlapcount[connected] .-= 1
             outofloop = filter(x -> overlapcount[x] <= 1, connected)
             for j in outofloop
@@ -112,7 +113,7 @@ function remove_point!(rng::AbstractRNG, Z::AbstractVector, alg::OIPS, K::Abstra
                 delete!(removable, i)
             end
         end
-        deleteat!(Z, toremove)
+        deleteat!(Z, sort(toremove))
     end
     return Z
 end
