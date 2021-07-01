@@ -9,20 +9,42 @@ A package for selecting inducing points for sparse GPs
 
 This package provide a collection of inducing point location selection algorithms, both offline and online.
 
-For example
+## Offline algorithms
 
+
+Offline algorithms are meant to be run once over the data before training begins.
+Here is an example where we use the k-means algorithm
 ```julia
 using InducingPoints
-Z = KmeansIP(X, 10, obsdim = 1)
+X = [rand(5) for _ in 1:100]
+alg = KMeansAlg(10) # Create the kmeans algorithm
+Z = inducingpoints(alg, X) # Returns a vector of vector of size 10 
 ```
 will return 10 inducing points selected as clusters by the k-means algorithm
 
-For online algorithms, one need to first create an empty object. For example
-
+Note that it is possible to pass data as a matrix as well following the convention of [KernelFunctions.jl](https://juliagaussianprocesses.github.io/KernelFunctions.jl/dev/userguide/#Creating-a-Kernel-Matrix)
 ```julia
-Z = OIPS(200) # Method from unpublished paper (for now!)
+X = rand(5 , 1000)
+alg = KMeansAlg(10, Euclidean()) # We can also use different metrics
+Z = inducingpoints(alg, X) # This still returns a vector of vector of size 10 
 ```
 
-The first time data is met `init(Z, X, args...)` should be called (args depend of the algorithm). `init` will return a new object correctly parametrized.
+## Online algorithms
 
-In the subsequent calls `update!(Z, X, args...)` to add/remove/move points.
+Online algorithms needs two API, a first one to create the initial vector of inducing points and another one to update it with new data.
+For example following [this work](https://drive.google.com/file/d/1IPTUBfY_b2WElTWBIVU4lrbHcXnbTWdB/view)
+
+```julia
+alg = OIPS(200) # We expect 200 inducing points
+kernel = SqExponential()
+X = [rand(5) for _ in 1:100] # We have some initial data
+Z = initZ(alg, X; kernel=kernel) # We create an initial vector
+X_new = [rand(5) for _ in 1:50] # We get some new data
+updateZ!(Z, alg, X_new; kernel=kernel) # Points will be acordingly added (or removed!)
+```
+
+Note that `Z` is directly changed in place.
+
+## Notes
+
+Make sure to check each algorithm docs independently, they will give you more details on what arguments they need and what they do!

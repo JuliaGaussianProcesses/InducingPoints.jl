@@ -1,70 +1,128 @@
 module InducingPoints
 
-export AbstractInducingPoints
-export KmeansIP
-export OptimIP
-export Webscale, OIPS, KmeansIP, kDPP, StdDPP, SeqDPP, GreedyIP, RandomSubset, UniformGrid, StreamKmeans
-export init, update!
+import Base: rand, show
 
-using StatsBase: Weights, sample
-using DeterminantalPointProcesses
-using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
+using AbstractGPs: AbstractGPs
 using Clustering: kmeans!
-using Distances
 using DataStructures
+using DeterminantalPointProcesses: DPP
+using Distances
 using KernelFunctions
 using KernelFunctions: ColVecs, RowVecs, vec_of_vecs
-using Random: rand, bitrand, AbstractRNG, MersenneTwister
-import Base: rand, show
+using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
+using Random: rand, bitrand, AbstractRNG, MersenneTwister, GLOBAL_RNG
+using StatsBase: Weights, sample
+
+export AbstractInducingPointsSelectionAlg
+
+## Generic functions
+
+export inducingpoints
+export initZ
+export updateZ!
+
+## Offline algorithms
+export KmeansAlg
+export RandomSubset
+export StdDPP, kDPP
+export Greedy
+
+## Online algorithms
+export OIPS
+export SeqDPP
+export StreamKmeans
+export UniformGrid
+export Webscale
 
 const jitt = 1e-5
 
-abstract type AbstractInducingPoints{S, TZ<:AbstractVector{S}} <: AbstractVector{S} end
+abstract type AbstractInducingPointsSelectionAlg end
 
-const AIP = AbstractInducingPoints
+const AIPSA = AbstractInducingPointsSelectionAlg
 
-abstract type OfflineInducingPoints{S, TZ<:AbstractVector{S}} <: AIP{S, TZ} end
+abstract type OfflineInducingPointsSelectionAlg <: AIPSA end
 
-const OffIP = OfflineInducingPoints
+const OffIPSA = OfflineInducingPointsSelectionAlg
 
-abstract type OnlineInducingPoints{S, TZ<:AbstractVector{S}} <: AIP{S, TZ} end
+abstract type OnlineInducingPointsSelectionAlg <: AIPSA end
 
-const OnIP = OnlineInducingPoints
+const OnIPSA = OnlineInducingPointsSelectionAlg
 
-Base.size(Z::AIP) = size(Z.Z)
-Base.length(Z::AIP) = length(Z.Z)
-Base.getindex(Z::AIP, i::Int) = getindex(Z.Z, i)
-Base.vec(Z::AIP) = Z.Z
+## Wrapper for matrices
+"""
+     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractVector; kwargs...)
+     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
 
-struct CustomInducingPoints{S,TZ<:AbstractVector{S}} <: OffIP{S,TZ}
-     Z::TZ
+Select inducing points according to the algorithm `alg`.
+"""
+inducingpoints
+
+function inducingpoints(
+    rng::AbstractRNG, alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...
+)
+    return inducingpoints(rng, alg, vec_of_vecs(X; obsdim=obsdim); kwargs...)
 end
 
-init(Z::OnIP, X::AbstractMatrix, args...; obsdim = 1) = init(Z, vec_of_vecs(X, obsdim = obsdim), args...)
+function inducingpoints(alg::AIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+    return inducingpoints(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
+end
 
-init(Z::OnIP, X::AbstractVector, ::Kernel) = init(Z, X)
+## Wrapper for the RNG
+function inducingpoints(alg::AIPSA, X::AbstractVector; kwargs...)
+    return inducingpoints(GLOBAL_RNG, alg, X; kwargs...)
+end
 
-update!(Z::OnIP, X::AbstractMatrix, args...; obsdim = 1) = init(Z, vec_of_vecs(X, obsdim = obsdim), args...)
+## Online IP selection functions 
+"""
+     initZ([rng::AbstractRNG], alg::OnIPSA, X::AbstractVector; kwargs...)
+     initZ([rng::AbstractRNG], alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
 
-update!(Z::OnIP, X::AbstractVector, args...) = add_point!(Z, X, args...)
+Select inducing points according to the algorithm `alg` and return a Vector of Vector.
+"""
+initZ
 
-add_point!(Z::OnIP, X::AbstractVector, ::Kernel) = add_point!(Z, X)
+initZ(Z::OnIPSA, X::AbstractVector; kwargs...) = initZ(GLOBAL_RNG, Z, X; kwargs...)
 
-remove_point!(::OnIP, args...) = nothing
+function initZ(alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+    return initZ(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
+end
 
+function initZ(rng::AbstractRNG, alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+    return initZ(rng, vec_of_vecs(X; obsdim=obsdim), X; kwargs...)
+end
 
-include("optimIP.jl")
-include("seqdpp.jl")
-include("kdpp.jl")
-include("stddpp.jl")
-include("streamkmeans.jl")
-include("webscale.jl")
-include("oips.jl")
-include("kmeans.jl")
-include("greedyip.jl")
-include("randomsubset.jl")
-include("unigrid.jl")
+"""
+    updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
 
+Update inducing points `Z` with data `X` and algorithm `alg`
+"""
+updateZ!
 
+function updateZ!(Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
+    return updateZ!(GLOBAL_RNG, Z, alg, X; kwargs...)
+end
+# Default behavior is to simply add points
+function updateZ!(
+    rng::AbstractRNG, Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...
+)
+    return add_point!(rng, Z, alg, X; kwargs...)
+end
+
+## Offline algorithms
+include(joinpath("offline", "kmeans.jl"))
+include(joinpath("offline", "randomsubset.jl"))
+include(joinpath("offline", "stddpp.jl"))
+include(joinpath("offline", "kdpp.jl"))
+include(joinpath("offline", "greedyip.jl"))
+
+## Online algorithms
+include(joinpath("online", "seqdpp.jl"))
+include(joinpath("online", "streamkmeans.jl"))
+include(joinpath("online", "webscale.jl"))
+include(joinpath("online", "oips.jl"))
+include(joinpath("online", "unigrid.jl"))
+
+## Utilities
+include("utils.jl")
 
 end
