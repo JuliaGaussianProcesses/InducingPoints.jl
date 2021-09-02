@@ -10,7 +10,7 @@ struct UniGrid <: OnIPSA
     m::Int # Number of points per dimension
 end
 
-Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.K).")
+Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.m).")
 
 function initZ(
     ::AbstractRNG,
