@@ -1,25 +1,25 @@
 """
-    StreamKmeans(k_target::Int)
+    StreamKmeans(m_target::Int)
 
 Online clustering algorithm [1] to select inducing points in a streaming setting.
 Reference :
 [1] Liberty, E., Sriharsha, R. & Sviridenko, M. An Algorithm for Online K-Means Clustering. arXiv:1412.5721 [cs] (2015).
 """
 mutable struct StreamKmeans{T} <: OnIPSA
-    k_target::Int
-    k_efficient::Int
+    m_target::Int
+    m_efficient::Int
     f::T
     q::Int
 end
 
-StreamKmeans(k_target::Int) = StreamKmeans(k_target, 0, 0.0, 0)
+StreamKmeans(m_target::Int) = StreamKmeans(m_target, 0, 0.0, 0)
 
-function initZ(rng::AbstractRNG, alg::StreamKmeans, X::AbstractVector, kernel=nothing)
+function initZ(rng::AbstractRNG, alg::StreamKmeans, X::AbstractVector; kernel=nothing, kwargs...)
     length(X) > 10 ||
         throw(ArgumentError("The first batch of data should be bigger than 10 samples"))
-    k_efficient = max(1, ceil(Int, (alg.k_target - 15) / 5))
-    alg.k_efficient = k_efficient + 10 > length(X) ? 0 : k_efficient
-    samp = sample(rng, 1:length(X), alg.k_efficient + 10; replace=false)
+    m_efficient = max(1, ceil(Int, (alg.m_target - 15) / 5))
+    alg.m_efficient = m_efficient + 10 > length(X) ? 0 : m_efficient
+    samp = sample(rng, 1:length(X), alg.m_efficient + 10; replace=false)
     Z = X[samp]
     w = zeros(k)
     for i in 1:k
@@ -36,6 +36,7 @@ function add_point!(
     alg::StreamKmeans,
     X::AbstractVector;
     kernel=nothing,
+    kwargs...
 )
     b = length(X) # Size of the input data
     for i in 1:b
@@ -45,7 +46,7 @@ function add_point!(
             push!(Z, X[i])
             alg.q += 1
         end
-        if alg.q >= alg.k_efficient
+        if alg.q >= alg.m_efficient
             alg.q = 0
             alg.f *= 10
         end
