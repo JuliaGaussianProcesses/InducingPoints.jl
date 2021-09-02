@@ -1,7 +1,7 @@
 name = "InducingPoints"
 uuid = "b4bd816d-b975-4295-ac05-5f2992945579"
 authors = ["Theo Galy-Fajou <theo.galyfajou@gmail.com> and JuliaGaussianProcesses"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
