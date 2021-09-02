@@ -38,11 +38,11 @@ With `init`, a first instance of `Z` is created.
 `update!` will then update the vectors in place.
 
 The Online options are:
-- [OnlineIPSelection](@ref) : A method based on distance between inducing points and data
-- [UniGrid](@ref) : A regularly-spaced grid whom edges are adapted given the data
-- [SeqDPP](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditionned on the existing inducing points.
-- [StreamKmeans](@ref) : An online version of k-means.
-- [Webscale](@ref) : Another online version of k-means
+- [`OnlineIPSelection`](@ref) : A method based on distance between inducing points and data
+- [`UniGrid`](@ref) : A regularly-spaced grid whom edges are adapted given the data
+- [`SeqDPP`](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditionned on the existing inducing points.
+- [`StreamKmeans`](@ref) : An online version of k-means.
+- [`Webscale`](@ref) : Another online version of k-means
 
 ## Index 
 ```@index
