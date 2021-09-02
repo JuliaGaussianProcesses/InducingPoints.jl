@@ -15,7 +15,8 @@ Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.m).
 function initZ(
     ::AbstractRNG,
     alg::UniGrid,
-    X::Union{AbstractVector{<:Real},AbstractVector{<:AbstractVector{<:Real}}},
+    X::Union{AbstractVector{<:Real},AbstractVector{<:AbstractVector{<:Real}}};
+    kwargs...
 )
     ndim = length(first(X)) # Take the dimensionality
     bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
@@ -25,7 +26,7 @@ function initZ(
     return Z
 end
 
-function updateZ!(::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector)
+function updateZ!(::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...)
     ndim = length(Z)
     new_bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
     map!(Z, Z, new_bounds) do Z_d, new_b
