@@ -7,7 +7,7 @@ struct SeqDPP <: OnIPSA end
 
 Base.show(io::IO, ::SeqDPP) = print(io, "Sequential DPP")
 
-function initZ(rng::AbstractRNG, ::SeqDPP, X::AbstractVector; kernel::Kernel; kwargs...)
+function initZ(rng::AbstractRNG, ::SeqDPP, X::AbstractVector; kernel::Kernel, kwargs...)
     length(X) > 2 || throw(ArgumentError("First batch should contain at least 3 elements"))
     K = kernelmatrix(kernel, X) + jitt * I
     dpp = DPP(K)
