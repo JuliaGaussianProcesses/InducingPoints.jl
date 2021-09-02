@@ -31,7 +31,7 @@ export Greedy
 export OIPS
 export SeqDPP
 export StreamKmeans
-export UniformGrid
+export UniGrid
 export Webscale
 
 const jitt = 1e-5
