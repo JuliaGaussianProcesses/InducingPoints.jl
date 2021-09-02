@@ -1,5 +1,5 @@
 """
-    Webscale(k::Int)
+    Webscale(m::Int)
 
 Online k-means algorithm based on [1].
 
@@ -14,7 +14,7 @@ function Webscale(m::Int)
     return Webscale(m, zeros(Int, m))
 end
 
-function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector)
+function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector; kwargs...)
     length(X) >= alg.m || error(
         "Input data not big enough given desired number of inducing points : $(alg.m)"
     )
@@ -22,7 +22,7 @@ function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector)
     return Z
 end
 
-function add_point!(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::AbstractVector)
+function add_point!(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::AbstractVector; kwargs...)
     d = zeros(Int, length(X))
     for i in 1:length(X)
         d[i] = find_nearest_center(X[i], Z)[1] # Save the closest IP index for each point

@@ -1,5 +1,5 @@
 """
-    UniGrid(K::Int)
+    UniGrid(m::Int)
 
 where `m` is the number of points on each dimension
 Adaptive uniform grid based on [1]
