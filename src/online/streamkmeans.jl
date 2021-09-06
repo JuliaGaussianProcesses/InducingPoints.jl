@@ -32,18 +32,18 @@ end
 
 function add_point!(
     rng::AbstractRNG,
-    Z::AbstractVector,
+    Z::AbstractVector{T},
     alg::StreamKmeans,
     X::AbstractVector;
     kernel=nothing,
     kwargs...
-)
+) where {T}
     b = length(X) # Size of the input data
     for i in 1:b
         val = find_nearest_center(X[i], Z, kernel)[2]
         if val > (alg.f * rand(rng))
             # new_centers = vcat(new_centers,X[i,:]')
-            push!(Z, X[i])
+            T isa Real ? push!(Z, X[i]) : push!(Z, X[i:i])
             alg.q += 1
         end
         if alg.q >= alg.m_efficient
@@ -56,18 +56,18 @@ end
 
 function add_point(
     rng::AbstractRNG,
-    Z::AbstractVector,
+    Z::AbstractVector{T},
     alg::StreamKmeans,
     X::AbstractVector;
     kernel=nothing,
     kwargs...
-)
+) where {T}
     b = length(X) # Size of the input data
     for i in 1:b
         val = find_nearest_center(X[i], Z, kernel)[2]
         if val > (alg.f * rand(rng))
             # new_centers = vcat(new_centers,X[i,:]')
-            Z= vcat(Z, X[i])
+            Z= T isa Real ? vcat(Z, X[i]) : vcat(Z, X[i:i])
             alg.q += 1
         end
         if alg.q >= alg.m_efficient

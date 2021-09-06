@@ -87,7 +87,7 @@ function add_point!(
         kx = kernelmatrix(kernel, X[i:i], copy(Z))
         # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
         if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point
-            push!(Z, X[i])
+            T isa Real ? push!(Z, X[i]) : push!(Z, X[i:i])
         end
         while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
             K = kernelmatrix(kernel, copy(Z))
@@ -110,8 +110,8 @@ function add_point(
     for i in 1:b # Parse all points from X
         kx = kernelmatrix(kernel, X[i:i], copy(Z))
         # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
-        if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point
-            Z = vcat(Z, X[i])
+        if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point 
+            Z = T isa Real ? vcat(Z, X[i]) : vcat(Z, X[i:i])
         end
         while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
             K = kernelmatrix(kernel, copy(Z))

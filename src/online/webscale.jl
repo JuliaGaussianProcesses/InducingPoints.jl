@@ -22,7 +22,7 @@ function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector; kwargs...)
     return Z
 end
 
-function add_point!(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::AbstractVector; kwargs...)
+function add_point!(::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::AbstractVector; kwargs...) where {T}
     d = zeros(Int, length(X))
     for i in 1:length(X)
         d[i] = find_nearest_center(X[i], Z)[1] # Save the closest IP index for each point
@@ -35,7 +35,7 @@ function add_point!(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::Abstract
     return Z
 end
 
-function add_point(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::AbstractVector; kwargs...)
+function add_point(::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::AbstractVector; kwargs...) where {T}
     d = zeros(Int, length(X))
     Z = copy(Z)
     for i in 1:length(X)
