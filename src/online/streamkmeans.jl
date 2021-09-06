@@ -14,9 +14,18 @@ end
 
 StreamKmeans(m_target::Int) = StreamKmeans(m_target, 0, 0.0, 0)
 
-Base.show(io::IO, alg::StreamKmeans) = print(io, "Streaming Kmeans (m_target=$(alg.m_target))")
+function Base.show(io::IO, alg::StreamKmeans)
+    return print(io, "Streaming Kmeans (m_target=$(alg.m_target))")
+end
 
-function initZ(rng::AbstractRNG, alg::StreamKmeans, X::AbstractVector; kernel=nothing, arraytype=Vector{Float64}, kwargs...)
+function initZ(
+    rng::AbstractRNG,
+    alg::StreamKmeans,
+    X::AbstractVector;
+    kernel=nothing,
+    arraytype=Vector{Float64},
+    kwargs...,
+)
     length(X) > 10 ||
         throw(ArgumentError("The first batch of data should be bigger than 10 samples"))
     m_efficient = max(1, ceil(Int, (alg.m_target - 15) / 5))
@@ -39,7 +48,7 @@ function add_point!(
     alg::StreamKmeans,
     X::AbstractVector;
     kernel=nothing,
-    kwargs...
+    kwargs...,
 ) where {T}
     b = length(X) # Size of the input data
     for i in 1:b
@@ -63,7 +72,7 @@ function add_point(
     alg::StreamKmeans,
     X::AbstractVector;
     kernel=nothing,
-    kwargs...
+    kwargs...,
 ) where {T}
     b = length(X) # Size of the input data
     for i in 1:b

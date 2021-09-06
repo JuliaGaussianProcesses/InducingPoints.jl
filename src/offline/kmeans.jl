@@ -89,4 +89,3 @@ function kmeans_seeding(
     end
     return C
 end
-

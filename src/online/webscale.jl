@@ -16,7 +16,9 @@ end
 
 Base.show(io::IO, alg::Webscale) = print(io, "Webscale (m = ", alg.m, ")")
 
-function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector; arraytype=Vector{Float64}, kwargs...)
+function initZ(
+    rng::AbstractRNG, alg::Webscale, X::AbstractVector; arraytype=Vector{Float64}, kwargs...
+)
     length(X) >= alg.m || error(
         "Input data not big enough given desired number of inducing points : $(alg.m)"
     )
@@ -24,7 +26,9 @@ function initZ(rng::AbstractRNG, alg::Webscale, X::AbstractVector; arraytype=Vec
     return Z
 end
 
-function add_point!(::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::AbstractVector; kwargs...) where {T}
+function add_point!(
+    ::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::AbstractVector; kwargs...
+) where {T}
     d = zeros(Int, length(X))
     for i in 1:length(X)
         d[i] = find_nearest_center(X[i], Z)[1] # Save the closest IP index for each point
@@ -37,7 +41,9 @@ function add_point!(::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::Abstr
     return Z
 end
 
-function add_point(::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::AbstractVector; kwargs...) where {T}
+function add_point(
+    ::AbstractRNG, Z::AbstractVector{T}, alg::Webscale, X::AbstractVector; kwargs...
+) where {T}
     d = zeros(Int, length(X))
     Z = copy(Z)
     for i in 1:length(X)

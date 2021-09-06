@@ -1,5 +1,7 @@
 "Find the closest center to X among Z, return the index and the distance"
-function find_nearest_center(X::Union{Real,AbstractVector}, Z::AbstractVector, kernel=nothing)
+function find_nearest_center(
+    X::Union{Real,AbstractVector}, Z::AbstractVector, kernel=nothing
+)
     best = 1
     best_val = Inf
     for i in 1:length(Z)
@@ -13,11 +15,10 @@ function find_nearest_center(X::Union{Real,AbstractVector}, Z::AbstractVector, k
 end
 
 #Compute the minimum distance between a vector and a collection of vectors
-function mindistance(metric::SemiMetric, x::AbstractVector, C::AbstractVector) 
+function mindistance(metric::SemiMetric, x::AbstractVector, C::AbstractVector)
     #Point to look for, collection of centers, number of centers computed
     return minimum(evaluate(metric, c, x) for c in C)
 end
-
 
 # Compute the distance (kernel if included) between a point and a find_nearest_center"
 function distance(X, C, ::Nothing)

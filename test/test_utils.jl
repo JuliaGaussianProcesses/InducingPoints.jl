@@ -9,7 +9,7 @@ function test_Zalg(alg::InducingPoints.OnIPSA, N::Int=30, D::Int=3; kwargs...)
             @test eltype(Z) == T
             Z = updateZ(Z, alg, X2; kwargs...)
             @test eltype(Z) == T
-        end 
+        end
     end
     @testset "Test Vector{Vector}" begin
         for T in [Float64, Float32]

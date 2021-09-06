@@ -17,5 +17,7 @@
         alg, X; y=rand(N + 1), kernel=kernel, noise=noise
     )
     @test_throws ArgumentError inducingpoints(alg, X; y=y, kernel=kernel, noise=-1)
-    @test_throws ErrorException inducingpoints(Greedy(N + 1, N), X; y=y, kernel=kernel, noise=noise)
+    @test_throws ErrorException inducingpoints(
+        Greedy(N + 1, N), X; y=y, kernel=kernel, noise=noise
+    )
 end
