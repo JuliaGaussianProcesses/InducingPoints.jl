@@ -53,3 +53,27 @@ function add_point!(
     end
     return Z
 end
+
+function add_point(
+    rng::AbstractRNG,
+    Z::AbstractVector,
+    alg::StreamKmeans,
+    X::AbstractVector;
+    kernel=nothing,
+    kwargs...
+)
+    b = length(X) # Size of the input data
+    for i in 1:b
+        val = find_nearest_center(X[i], Z, kernel)[2]
+        if val > (alg.f * rand(rng))
+            # new_centers = vcat(new_centers,X[i,:]')
+            Z= vcat(Z, X[i])
+            alg.q += 1
+        end
+        if alg.q >= alg.m_efficient
+            alg.q = 0
+            alg.f *= 10
+        end
+    end
+    return Z
+end

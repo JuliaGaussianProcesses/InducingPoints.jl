@@ -34,3 +34,17 @@ function add_point!(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::Abstract
     end
     return Z
 end
+
+function add_point(::AbstractRNG, Z::AbstractVector, alg::Webscale, X::AbstractVector; kwargs...)
+    d = zeros(Int, length(X))
+    Z = copy(Z)
+    for i in 1:length(X)
+        d[i] = find_nearest_center(X[i], Z)[1] # Save the closest IP index for each point
+    end
+    for i in 1:length(X)
+        alg.v[d[i]] += 1
+        η = 1 / alg.v[d[i]]
+        Z[d[i]] .= (1 - η) * Z[d[i]] + η * X[i] # Update the IP position
+    end
+    return Z
+end
