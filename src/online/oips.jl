@@ -68,6 +68,17 @@ function updateZ!(
     return add_point!(rng, Z, alg, X, kernel)
 end
 
+function updateZ(
+    rng::AbstractRNG,
+    Z::AbstractVector,
+    alg::OIPS,
+    X::AbstractVector;
+    kernel::Kernel,
+    kwargs...,
+)
+    return add_point(rng, Z, alg, X, kernel)
+end
+
 function add_point!(
     rng::AbstractRNG, Z::AbstractVector{T}, alg::OIPS, X::AbstractVector, kernel::Kernel
 ) where {T}
@@ -92,7 +103,56 @@ function add_point!(
     return Z
 end
 
+function add_point(
+    rng::AbstractRNG, Z::AbstractVector{T}, alg::OIPS, X::AbstractVector, kernel::Kernel
+) where {T}
+    b = length(X)
+    for i in 1:b # Parse all points from X
+        kx = kernelmatrix(kernel, X[i:i], copy(Z))
+        # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
+        if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point
+            Z = vcat(Z, X[i])
+        end
+        while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
+            K = kernelmatrix(kernel, copy(Z))
+            m = maximum(K - Diagonal(K))
+            alg.ρs[2] = alg.η * m
+            Z = remove_point(rng, Z, alg, K)
+            if alg.ρs[2] < alg.ρs[1] # Readapt the thresholds
+                alg.ρs[1] = alg.η * alg.ρs[2]
+            end
+            @info "ρ_accept reset to : $(alg.ρs[1])"
+        end
+    end
+    return Z
+end
+
 function remove_point!(rng::AbstractRNG, Z::AbstractVector, alg::OIPS, K::AbstractMatrix)
+    if length(Z) > alg.kmin # Only remove points if the minimum is not reached
+        overlapcount = (x -> count(x .> alg.ρs[2])).(eachrow(K))
+        removable = SortedSet(findall(x -> x > 1, overlapcount))
+        toremove = []
+        while !isempty(removable) && length(Z) > alg.kmin
+            i = sample(rng, collect(removable), Weights(overlapcount[collect(removable)]))
+            connected = findall(x -> x > alg.ρs[2], K[i, :])
+            overlapcount[connected] .-= 1
+            outofloop = filter(x -> overlapcount[x] <= 1, connected)
+            for j in outofloop
+                if issubset(j, removable)
+                    delete!(removable, j)
+                end
+            end
+            push!(toremove, i)
+            if issubset(i, removable)
+                delete!(removable, i)
+            end
+        end
+        deleteat!(Z, sort(toremove))
+    end
+    return Z
+end
+
+function remove_point(rng::AbstractRNG, Z::AbstractVector, alg::OIPS, K::AbstractMatrix)
     if length(Z) > alg.kmin # Only remove points if the minimum is not reached
         overlapcount = (x -> count(x .> alg.ρs[2])).(eachrow(K))
         removable = SortedSet(findall(x -> x > 1, overlapcount))
@@ -113,7 +173,7 @@ function remove_point!(rng::AbstractRNG, Z::AbstractVector, alg::OIPS, K::Abstra
                 delete!(removable, i)
             end
         end
-        deleteat!(Z, sort(toremove))
+        Z = Z[setdiff(1:end, toremove)]
     end
     return Z
 end

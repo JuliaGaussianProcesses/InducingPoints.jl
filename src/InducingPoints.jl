@@ -19,7 +19,7 @@ export AbstractInducingPointsSelectionAlg
 
 export inducingpoints
 export initZ
-export updateZ!
+export updateZ!, updateZ
 
 ## Offline algorithms
 export KmeansAlg
@@ -106,6 +106,23 @@ function updateZ!(
     rng::AbstractRNG, Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...
 )
     return add_point!(rng, Z, alg, X; kwargs...)
+end
+
+"""
+    updateZ([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
+
+Return new vector of inducing points `Z` with data `X` and algorithm `alg` without changing the original one
+"""
+updateZ
+
+function updateZ(Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
+    return updateZ(GLOBAL_RNG, Z, alg, X; kwargs...)
+end
+# Default behavior is to simply add points
+function updateZ(
+    rng::AbstractRNG, Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...
+)
+    return add_point(rng, Z, alg, X; kwargs...)
 end
 
 ## Offline algorithms

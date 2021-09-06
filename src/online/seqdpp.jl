@@ -30,6 +30,17 @@ function add_point!(
     return push!(Z, X[new_samp]...)
 end
 
+function add_point(
+    rng::AbstractRNG, Z::AbstractVector, ::SeqDPP, X::AbstractVector; kernel::Kernel, kwargs...
+)
+    L = kernelmatrix(kernel, vcat(Z, X)) + jitt * I
+    Iₐ = diagm(vcat(zeros(length(Z)), ones(length(X))))
+    Lₐ = inv(inv(L + Iₐ)[(length(Z) + 1):size(L, 1), (length(Z) + 1):size(L, 1)]) - I
+    new_dpp = DPP(Lₐ)
+    new_samp = rand(rng, new_dpp)
+    return vcat(Z, X[new_samp])
+end
+
 # function add_point_old!(alg::SeqDPP, X, y, kernel)
 #     alg.K = Symmetric(kernelmatrix(alg.Z, kernel) + 1e-7I)
 #     for i = 1:size(X, 1)
