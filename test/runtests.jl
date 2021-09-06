@@ -4,6 +4,8 @@ using KernelFunctions
 using KernelFunctions: ColVecs
 using Test
 using Random: seed!
+include("test_utils.jl")
+
 @testset "InducingPoints.jl" begin
     @testset "Offline" begin
         for file in readdir("offline")

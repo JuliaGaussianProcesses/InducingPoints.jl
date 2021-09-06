@@ -52,7 +52,6 @@ function initZ(
         throw(ArgumentError("First batch should have at least $(alg.kmin) samples"))
     samples = sample(rng, 1:N, floor(Int, alg.kmin); replace=false)
     Z = to_vec_of_vecs(X[samples], arraytype)
-    # Z = collect.(X[samples])
     Z = updateZ!(rng, Z, alg, X; kernel=kernel)
     return Z
 end
@@ -85,9 +84,8 @@ function add_point!(
     b = length(X)
     for i in 1:b # Parse all points from X
         kx = kernelmatrix(kernel, X[i:i], copy(Z))
-        # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
         if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point
-            T isa Real ? push!(Z, X[i]) : push!(Z, X[i:i])
+            push!(Z, X[i])
         end
         while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
             K = kernelmatrix(kernel, copy(Z))
@@ -111,7 +109,7 @@ function add_point(
         kx = kernelmatrix(kernel, X[i:i], copy(Z))
         # d = find_nearest_center(X[i,:],Z.centers,kernel)[2]
         if maximum(kx) < alg.ρs[1] # If the biggest correlation is smaller than threshold add point 
-            Z = T isa Real ? vcat(Z, X[i]) : vcat(Z, X[i:i])
+            Z = T isa Real ? vcat(Z, T(X[i])) : vcat(Z, T.(X[i:i]))
         end
         while length(Z) > alg.kmax ## If maximum number of points is reached, readapt the threshold
             K = kernelmatrix(kernel, copy(Z))
