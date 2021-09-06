@@ -22,4 +22,7 @@
 
     @test_throws ArgumentError OIPS(-1)
     @test_throws ArgumentError OIPS(nInd, 2.0)
+
+    test_Zalg(OIPS(ρ_accept; ρ_remove=ρ_remove); kernel=kernel)
+    test_Zalg(OIPS(nInd); kernel=kernel)
 end
