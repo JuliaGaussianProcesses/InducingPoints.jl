@@ -68,16 +68,16 @@ function kmeans_seeding(
     metric::SemiMetric, # Metric used
     nMarkov::Integer, # Number of Markov iterations
 )
-    nSamples = length(X) # Number of input samples
+    nsamples = length(X) # Number of input samples
     # Preprocessing, 
-    init = rand(rng, 1:nSamples) # Sample first random center
+    init = rand(rng, 1:nsamples) # Sample first random center
     C = collect.(X[init:init]) # Initialize the collection of centroids
     q = vec(pairwise(metric, X, C)) # Create the pairwise values between the data and the first centroid
-    q = Weights(q / sum(q) .+ 1.0 / (2 * nSamples), 1) # Create weights to work with
-    for i in 2:nC
+    q = Weights(q / sum(q) .+ 1.0 / (2 * nsamples), 1) # Create weights to work with
+    for _ in 2:nC
         x = X[sample(rng, q)] # weighted sampling,
         mindist = mindistance(metric, x, C) # Find the closest centroid to the random sample x
-        for j in 2:nMarkov # Iterate over nMarkov iterations
+        for _ in 2:nMarkov # Iterate over nMarkov iterations
             y = X[sample(rng, q)] # Draw a new sample 
             dist = mindistance(metric, y, C) # Find the closest centroid to the random sample y
             if (dist / mindist) > rand(rng) # Acceptance step to see if y is better than x
@@ -85,7 +85,7 @@ function kmeans_seeding(
                 mindist = dist
             end
         end
-        push!(C, x)
+        push!(C, x isa Real ? fill(x) : x)
     end
     return C
 end

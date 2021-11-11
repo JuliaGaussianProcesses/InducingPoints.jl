@@ -126,18 +126,18 @@ function updateZ(
 end
 
 ## Offline algorithms
-include(joinpath("offline", "kmeans.jl"))
-include(joinpath("offline", "randomsubset.jl"))
-include(joinpath("offline", "stddpp.jl"))
-include(joinpath("offline", "kdpp.jl"))
-include(joinpath("offline", "greedyip.jl"))
+include("offline/kmeans.jl")
+include("offline/randomsubset.jl")
+include("offline/stddpp.jl")
+include("offline/kdpp.jl")
+include("offline/greedyip.jl")
 
 ## Online algorithms
-include(joinpath("online", "seqdpp.jl"))
-include(joinpath("online", "streamkmeans.jl"))
-include(joinpath("online", "webscale.jl"))
-include(joinpath("online", "oips.jl"))
-include(joinpath("online", "unigrid.jl"))
+include("online/seqdpp.jl")
+include("online/streamkmeans.jl")
+include("online/webscale.jl")
+include("online/oips.jl")
+include("online/unigrid.jl")
 
 ## Utilities
 include("utils.jl")

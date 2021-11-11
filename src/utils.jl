@@ -15,7 +15,7 @@ function find_nearest_center(
 end
 
 #Compute the minimum distance between a vector and a collection of vectors
-function mindistance(metric::SemiMetric, x::AbstractVector, C::AbstractVector)
+function mindistance(metric::SemiMetric, x::Union{Real,AbstractVector}, C::AbstractVector)
     #Point to look for, collection of centers, number of centers computed
     return minimum(evaluate(metric, c, x) for c in C)
 end
