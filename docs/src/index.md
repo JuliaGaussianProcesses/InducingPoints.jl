@@ -6,7 +6,7 @@ CurrentModule = InducingPoints
 
 InducingPoints.jl aims at providing an easy way to select inducing points locations for Sparse Gaussian Processes both in an online and offline setting.
 
-The point selection is splitted in the online (`OnIPSA`) and offline settings.
+The point selection is split in the online (`OnIPSA`) and offline settings.
 
 All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which can be passed to the different APIs
 
@@ -40,7 +40,7 @@ With `inducingpoints`, similarly to the offline setting, a first instance of `Z`
 The Online options are:
 - [`OnlineIPSelection`](@ref) : A method based on distance between inducing points and data
 - [`UniGrid`](@ref) : A regularly-spaced grid whom edges are adapted given the data
-- [`SeqDPP`](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditionned on the existing inducing points.
+- [`SeqDPP`](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditioned on the existing inducing points.
 - [`StreamKmeans`](@ref) : An online version of k-means.
 - [`Webscale`](@ref) : Another online version of k-means
 

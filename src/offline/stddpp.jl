@@ -1,8 +1,8 @@
-"""
+@doc raw"""
     StdDPP(kernel::Kernel)
 
 Standard DPP (Determinantal Point Process) sampling given `kernel`.
-The size of the returned `Z` is not fixed (but cannot be empty unlike in a classical DPP)
+The size of the returned `Z` is not fixed (but is not allowed to be empty unlike in a classical DPP).
 """
 struct StdDPP{K<:Kernel} <: OffIPSA
     kernel::K
