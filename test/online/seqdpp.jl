@@ -7,7 +7,7 @@
     X = ColVecs(rand(D, N) * 10)
     alg = SeqDPP()
     @test repr(alg) == "Sequential DPP"
-    Z = initZ(alg, X; kernel=kernel)
+    Z = inducingpoints(alg, X; kernel=kernel)
     updateZ!(Z, alg, X; kernel=kernel)
 
     test_Zalg(alg; kernel=kernel)

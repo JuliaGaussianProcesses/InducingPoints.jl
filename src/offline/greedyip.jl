@@ -40,44 +40,42 @@ Base.show(io::IO, ::Greedy) = print(io, "Greedy Selection of Inducing Points")
 
 function greedy_ip(
     rng::AbstractRNG,
-    X::AbstractVector,
+    X::AbstractVector{T},
     y::AbstractVector,
     kernel::Kernel,
     m::Int,
     s::Int,
     noise::Real,
-)
+) where {T}
     N = length(X) # Number of samples
     i = rand(rng, 1:N) # Take a random initial point
-    Z = collect.(X[i:i]) # Initialize empty array of IPs
-    IP_set = Set{Int}(i) # Keep track of selected points
+    ℐᵢₚ = Set{Int}(i) # Keep track of selected points
     f = AbstractGPs.GP(kernel) # GP object to compute the elbo
     for _ in 2:m
         # Evaluate on a subset of the points of a maximum size of 1000
-        X_test = Set(sample(rng, 1:N, min(1000, N); replace=false))
+        ℐₜₑₛₜ = Set(sample(rng, 1:N, min(1000, N); replace=false))
         best_i = 0
         best_L = -Inf
         # Parse over random points of this subset
-        new_candidates = collect(setdiff(X_test, IP_set))
+        ℐ_candidates = collect(setdiff(ℐₜₑₛₜ, ℐᵢₚ))
         # Sample a minibatch of candidates
         d = sample(
             rng,
-            collect(setdiff(X_test, IP_set)),
-            min(s, length(new_candidates));
+            collect(ℐ_candidates),
+            min(s, length(ℐ_candidates)); # Limit the number of possibility to s
             replace=false,
         )
         for j in d # Loop over every sample and evaluate the elbo addition with each new sample
-            new_Z = vcat(Z, X[j:j])
-            L = AbstractGPs.elbo(f(X[collect(X_test)], noise), y[collect(X_test)], f(new_Z))
+            ℐᵢₚ₊ = union(ℐᵢₚ, j)
+            L = AbstractGPs.elbo(f(X[collect(ℐₜₑₛₜ)], noise), y[collect(ℐₜₑₛₜ)], f(X[collect(ℐᵢₚ₊)]))
             if L > best_L
                 best_i = j
                 best_L = L
             end
         end
-        push!(Z, X[best_i])
-        push!(IP_set, best_i)
+        push!(ℐᵢₚ, best_i)
     end
-    return Z
+    return X[collect(ℐᵢₚ)]
 end
 
 # function elbo(Z::AbstractVector, X::AbstractVector, y::AbstractVector, kernel::Kernel, σ²::Real)

@@ -1,8 +1,8 @@
-"""
+@doc raw"""
     StdDPP(kernel::Kernel)
 
 Standard DPP (Determinantal Point Process) sampling given `kernel`.
-The size of the returned `Z` is not fixed (but cannot be empty unlike in a classical DPP)
+The size of the returned `Z` is not fixed (but is not allowed to be empty unlike in a classical DPP).
 """
 struct StdDPP{K<:Kernel} <: OffIPSA
     kernel::K
@@ -12,7 +12,7 @@ struct StdDPP{K<:Kernel} <: OffIPSA
 end
 
 function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kwargs...)
-    dpp = DPP(kernel, X)
+    dpp = DPP(alg.kernel, X)
     samp = rand(rng, dpp)
     while isempty(samp) # Sample from the DPP until there is a non-empty set
         samp = rand(rng, dpp)

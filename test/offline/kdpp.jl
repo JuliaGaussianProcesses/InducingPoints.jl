@@ -11,4 +11,5 @@
     @test length(Z) == nInd
     @test_throws ArgumentError kDPP(-1, kernel)
     @test_throws ErrorException inducingpoints(kDPP(100, kernel), X)
+    test_Zalg(kDPP(nInd, kernel), N)
 end

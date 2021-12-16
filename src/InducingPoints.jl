@@ -11,7 +11,7 @@ using KernelFunctions
 using KernelFunctions: ColVecs, RowVecs, vec_of_vecs
 using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
 using Random: rand, bitrand, AbstractRNG, MersenneTwister, GLOBAL_RNG
-using StatsBase: Weights, sample
+using StatsBase: Weights, sample, wsample
 
 export AbstractInducingPointsSelectionAlg
 
@@ -73,25 +73,7 @@ function inducingpoints(alg::AIPSA, X::AbstractVector; kwargs...)
 end
 
 ## Online IP selection functions 
-"""
-     initZ([rng::AbstractRNG], alg::OnIPSA, X::AbstractVector; kwargs...)
-     initZ([rng::AbstractRNG], alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
-
-Select inducing points according to the algorithm `alg` and return a Vector of Vector.
-"""
-initZ
-
-initZ(Z::OnIPSA, X::AbstractVector; kwargs...) = initZ(GLOBAL_RNG, Z, X; kwargs...)
-
-function initZ(alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
-    return initZ(GLOBAL_RNG, alg, X; obsdim=obsdim, kwargs...)
-end
-
-function initZ(rng::AbstractRNG, alg::OnIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
-    return initZ(rng, vec_of_vecs(X; obsdim=obsdim), X; kwargs...)
-end
-
-"""
+@doc raw"""
     updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
 
 Update inducing points `Z` with data `X` and algorithm `alg`
@@ -108,7 +90,7 @@ function updateZ!(
     return add_point!(rng, Z, alg, X; kwargs...)
 end
 
-"""
+@doc raw"""
     updateZ([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
 
 Return new vector of inducing points `Z` with data `X` and algorithm `alg` without changing the original one
@@ -141,5 +123,7 @@ include("online/unigrid.jl")
 
 ## Utilities
 include("utils.jl")
+
+@deprecate initZ inducingpoints
 
 end

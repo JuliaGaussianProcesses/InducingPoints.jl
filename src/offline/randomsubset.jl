@@ -1,4 +1,4 @@
-"""
+@doc raw"""
     RandomSubset(m::Int)
 
 ## Arguments
@@ -26,7 +26,7 @@ function inducingpoints(
     samp = if isnothing(weights)
         sample(rng, 1:nSamples, alg.m; replace=false)
     else
-        wsample(rng, 1:nSamples, alg.m, weights; replace=false)
+        wsample(rng, 1:nSamples, weights, alg.m; replace=false)
     end
     return X[samp]
 end

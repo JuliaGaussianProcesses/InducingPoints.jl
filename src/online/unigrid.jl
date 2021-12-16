@@ -12,7 +12,7 @@ end
 
 Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.m).")
 
-function initZ(
+function inducingpoints(
     ::AbstractRNG,
     alg::UniGrid,
     X::Union{AbstractVector{<:Real},AbstractVector{<:AbstractVector{<:Real}}};

@@ -47,17 +47,21 @@ end
 #Return K inducing points from X, m being the number of Markov iterations for the seeding
 function kmeans_ip(
     rng::AbstractRNG,
-    X::AbstractVector,
+    X::AbstractVector{T},
     nC::Int,
     metric::SemiMetric;
     nMarkov::Int=10,
     weights=nothing,
     tol=1e-3,
-)
+) where {T}
     C = kmeans_seeding(rng, X, nC, metric, nMarkov)
     C = reduce(hcat, C)
     kmeans!(reduce(hcat, X), C; weights=weights, tol=tol, distance=metric)
-    return ColVecs(C)
+    if T isa Real
+        return C
+    else
+        return ColVecs(C)
+    end
 end
 
 """Fast and efficient seeding for KMeans based on [`Fast and Provably Good Seeding for k-Means](https://las.inf.ethz.ch/files/bachem16fast.pdf)"""
