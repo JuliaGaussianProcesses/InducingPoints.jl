@@ -7,7 +7,7 @@ struct SeqDPP <: OnIPSA end
 
 Base.show(io::IO, ::SeqDPP) = print(io, "Sequential DPP")
 
-function initZ(
+function inducingpoints(
     rng::AbstractRNG,
     ::SeqDPP,
     X::AbstractVector;

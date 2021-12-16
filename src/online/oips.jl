@@ -39,7 +39,7 @@ function OIPS(kmax::Int, η::T=0.98, kmin::Real=10) where {T<:Real}
     return OIPS(T[0.95, sqrt(0.95)], kmax, kmin, η)
 end
 
-function initZ(
+function inducingpoints(
     rng::AbstractRNG,
     alg::OIPS,
     X::AbstractVector;

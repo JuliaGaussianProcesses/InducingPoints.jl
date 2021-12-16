@@ -10,10 +10,10 @@
     alg = OIPS(ρ_accept; ρ_remove=ρ_remove)
     @test repr(alg) ==
           "Online Inducing Point Selection (ρ_accept : $(ρ_accept), ρ_remove : $(ρ_remove), kmax : Inf)"
-    Z = initZ(alg, X; kernel=kernel)
+    Z = inducingpoints(alg, X; kernel=kernel)
     updateZ!(Z, alg, X; kernel=kernel)
     alg = OIPS(nInd)
-    Z = initZ(alg, X; kernel=kernel)
+    Z = inducingpoints(alg, X; kernel=kernel)
     @test length(Z) <= nInd
 
     @test_throws ArgumentError OIPS(2.0)

@@ -16,7 +16,7 @@ end
 
 Base.show(io::IO, alg::Webscale) = print(io, "Webscale (m = ", alg.m, ")")
 
-function initZ(
+function inducingpoints(
     rng::AbstractRNG, alg::Webscale, X::AbstractVector; arraytype=Vector{Float64}, kwargs...
 )
     length(X) >= alg.m || error(

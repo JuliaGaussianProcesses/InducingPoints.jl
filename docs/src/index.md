@@ -28,14 +28,14 @@ The Offline options are:
 Online selection is a bit more involved.
 ```julia
 alg = OIPS()
-Z = initZ(alg, x_1; kwargs...)
+Z = inducingpoints(alg, x_1; kwargs...)
 for x in eachbatch(X)
     updateZ!(Z, alg, x; kwargs...)
 end
 ```
 
-With `init`, a first instance of `Z` is created.
-`update!` will then update the vectors in place.
+With `inducingpoints`, similarly to the offline setting, a first instance of `Z` is created.
+`updateZ!` will then update the vectors in place.
 
 The Online options are:
 - [`OnlineIPSelection`](@ref) : A method based on distance between inducing points and data

@@ -18,7 +18,7 @@ function Base.show(io::IO, alg::StreamKmeans)
     return print(io, "Streaming Kmeans (m_target=$(alg.m_target))")
 end
 
-function initZ(
+function inducingpoints(
     rng::AbstractRNG,
     alg::StreamKmeans,
     X::AbstractVector;
