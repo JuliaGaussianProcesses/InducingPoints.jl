@@ -1,9 +1,9 @@
 @testset "k-Means" begin
     seed!(42)
     N = 20
-    nDim = 3
+    D = 3
     M = 10
-    X = rand(nDim, N)
+    X = rand(D, N)
     x = ColVecs(X)
     alg = KmeansAlg(M)
 
@@ -13,5 +13,7 @@
     @test length(Z) == M
     Z = inducingpoints(alg, X; obsdim=2, weights=rand(N))
     @test length(Z) == M
-    @test length(first(Z)) == nDim
+    @test length(first(Z)) == D
+
+    test_Zalg
 end

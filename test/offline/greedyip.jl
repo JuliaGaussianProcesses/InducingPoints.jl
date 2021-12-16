@@ -20,5 +20,5 @@
     @test_throws ErrorException inducingpoints(
         Greedy(N + 1, N), X; y=y, kernel=kernel, noise=noise
     )
-    test_Zalg(Greedy(nInd), N; kernel=kernel, noise=noise, y=y)
+    test_Zalg(Greedy(nInd, N), N; kernel=kernel, noise=noise, y=y)
 end

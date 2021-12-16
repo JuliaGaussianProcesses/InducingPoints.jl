@@ -11,7 +11,7 @@ using KernelFunctions
 using KernelFunctions: ColVecs, RowVecs, vec_of_vecs
 using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
 using Random: rand, bitrand, AbstractRNG, MersenneTwister, GLOBAL_RNG
-using StatsBase: Weights, sample
+using StatsBase: Weights, sample, wsample
 
 export AbstractInducingPointsSelectionAlg
 

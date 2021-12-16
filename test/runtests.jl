@@ -8,13 +8,13 @@ include("test_utils.jl")
 
 @testset "InducingPoints.jl" begin
     @testset "Offline" begin
-        for file in readdir("offline")
-            include(joinpath("offline", file))
+        for file in readdir(joinpath(@__DIR__, "offline"))
+            include(joinpath(@__DIR__, "offline", file))
         end
     end
     @testset "Online" begin
-        for file in readdir("online")
-            include(joinpath("online", file))
+        for file in readdir(joinpath(@__DIR__, "online"))
+            include(joinpath(@__DIR__, "online", file))
         end
     end
 end

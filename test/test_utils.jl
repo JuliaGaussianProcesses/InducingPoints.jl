@@ -44,22 +44,24 @@ function test_Zalg(alg::InducingPoints.OffIPSA, N::Int=30, D::Int=3; kwargs...)
     @testset "Test Vector{Real}" begin
         for T in [Float64, Float32]
             X = rand(T, N) * 10
-            Z = inducingpoints(alg, X; arraytype=Vector{T}, kwargs...)
+            Z = inducingpoints(alg, X; kwargs...)
+            @test Z isa AbstractVector
             @test eltype(Z) == T
         end
     end
     @testset "Test Vector{Vector}" begin
         for T in [Float64, Float32]
             X = [rand(T, D) * 10 for _ in 1:N]
-            Z = inducingpoints(alg, X; arraytype=Vector{T}, kwargs...)
-            @test eltype(Z) == Vector{T}
+            Z = inducingpoints(alg, X; kwargs...)
+            @test Z isa AbstractVector{<:AbstractVector}
+            @test first(Z) isa AbstractVector{<:T}
         end
     end
     @testset "Test ColVecs" begin
         for T in [Float64, Float32]
             X = ColVecs(rand(T, D, N) * 10)
-            Z = inducingpoints(alg, X; arraytype=Vector{T}, kwargs...)
-            @test eltype(Z) == Vector{T}
+            Z = inducingpoints(alg, X; kwargs...)
+            @test Z isa ColVecs{T}
         end
     end
 end

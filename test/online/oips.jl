@@ -9,7 +9,7 @@
     ρ_remove = 0.9
     alg = OIPS(ρ_accept; ρ_remove=ρ_remove)
     @test repr(alg) ==
-          "Online Inducing Point Selection (ρ_accept : $(ρ_accept), ρ_remove : $(ρ_remove), kmax : Inf)"
+        "Online Inducing Point Selection (ρ_accept : $(ρ_accept), ρ_remove : $(ρ_remove), kmax : Inf)"
     Z = inducingpoints(alg, X; kernel=kernel)
     updateZ!(Z, alg, X; kernel=kernel)
     alg = OIPS(nInd)
