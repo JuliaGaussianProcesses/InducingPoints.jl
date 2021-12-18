@@ -2,13 +2,11 @@
 CurrentModule = InducingPoints
 ```
 
-# InducingPoints
+# Intro
 
-InducingPoints.jl aims at providing an easy way to select inducing points locations for Sparse Gaussian Processes both in an online and offline setting.
+InducingPoints.jl aims at providing an easy way to select inducing points locations for Sparse Gaussian Processes both in an online and offline setting. These most used most prominently in sparse GP regression (see e.g. [`ApproximateGPs.jl](https://github.com/JuliaGaussianProcesses/ApproximateGPs.jl))
 
-The point selection is split in the online (`OnIPSA`) and offline settings.
-
-All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which can be passed to the different APIs
+All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which can be passed to the different APIs.
 
 ## Offline Inducing Points Selection
 
