@@ -1,5 +1,5 @@
 """
-    GreedyIP(m::Int, s::Int)
+    Greedy(m::Int, s::Int)
 
  - `m` is the desired number of inducing points
  - `s` is the minibatch size on which to select a new inducing point
