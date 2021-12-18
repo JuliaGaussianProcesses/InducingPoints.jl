@@ -3,7 +3,10 @@
     OIPS(kmax, η=0.98, kmin=10)
 
 Online Inducing Points Selection.
-Method from the paper include reference here.
+Method from [1]. Requires passing the `kernel` as keyword argument to `inducingpoints`.
+
+[1] Galy-Fajou, T. & Opper, M Adaptive Inducing Points Selection for Gaussian Processes. arXiv:2107.10066v1 (2021).
+
 """
 struct OnlineIPSelection{T,Tv<:AbstractVector{T},Tk} <: OnIPSA
     ρs::Tv # Vector of two elements corresponding to ρ_accept and ρ_remove

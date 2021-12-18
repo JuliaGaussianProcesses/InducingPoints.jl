@@ -1,7 +1,7 @@
 """
     SeqDPP()
 
-Sequential sampling via Determinantal Point Processes
+Sequential sampling via Determinantal Point Processes. Requires passing the `kernel` as keyword argument to `inducingpoints`.
 """
 struct SeqDPP <: OnIPSA end
 
