@@ -48,7 +48,3 @@ The Online options are:
 ```@index
 ```
 
-## API
-```@autodocs
-Modules = [InducingPoints]
-```
