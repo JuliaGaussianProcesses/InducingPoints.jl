@@ -50,10 +50,12 @@ const OnIPSA = OnlineInducingPointsSelectionAlg
 
 ## Wrapper for matrices
 """
-     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractVector; kwargs...)
-     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractVector; 
+        [y::AbstractVector, kernel::Kernel, noise::Real])
+     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractMatrix; 
+        obsdim=1, [y::AbstractVector, kernel::Kernel, noise::Real])
 
-Select inducing points according to the algorithm `alg`.
+Select inducing points according to the algorithm `alg`. The `kernel` keyword argument is required for the `Greedy`, `OnlineIPSelection`, `SeqDPP` algorithms. The `y` and `noise` keyword arguments are required for the `Greedy` algorithm. 
 """
 inducingpoints
 

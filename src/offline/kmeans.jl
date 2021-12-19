@@ -64,7 +64,7 @@ function kmeans_ip(
     end
 end
 
-"""Fast and efficient seeding for KMeans based on [`Fast and Provably Good Seeding for k-Means](https://las.inf.ethz.ch/files/bachem16fast.pdf)"""
+"""Fast and efficient seeding for KMeans based on [Fast and Provably Good Seeding for k-Means](https://las.inf.ethz.ch/files/bachem16fast.pdf)"""
 function kmeans_seeding(
     rng::AbstractRNG,
     X::AbstractVector, # Input data
