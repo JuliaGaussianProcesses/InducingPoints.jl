@@ -58,7 +58,7 @@ We start with a set of `N` data points of dimension `D`, which we would like to 
 D = 2
 N = 50
 M = 10
-x = [rand(D) for _ in 1:N]
+x = [rand(D) .* [0.8, 1.0] for _ in 1:N]
 nothing # hide
 ```
 
@@ -137,7 +137,7 @@ These algorithms are useful if we assume that we will have another set of data p
 ```@example
 D = 2 # hide
 N₂ = 25
-x₂ = [rand(D) for _ in 1:N₂] .* 0.25
+x₂ = [rand(D) .* [0.2, 1.0] + [0.8, 0.0] for _ in 1:N₂]
 nothing # hide
 ```
 We can then update the inital set of inducing points `Z` via 
