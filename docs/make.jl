@@ -13,6 +13,7 @@ makedocs(;
         canonical="https://JuliaGaussianProcesses.github.io/InducingPoints.jl",
         assets=String[],
     ),
+    strict=true,
     pages=["Home" => "index.md", "Algorithms" => "algorithms.md", "API" => "api.md"],
 )
 
