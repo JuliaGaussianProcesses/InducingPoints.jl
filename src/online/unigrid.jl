@@ -39,9 +39,7 @@ function updateZ!(
     return Z
 end
 
-function updateZ(
-    rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector
-)
+function updateZ(rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector)
     Zn = deepcopy(Z)
     return updateZ!(rng, Zn, alg, X)
 end
