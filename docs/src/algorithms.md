@@ -3,6 +3,7 @@ using Random: seed!
 seed!(42)
 using KernelFunctions
 using Plots
+plotlyjs()
 using InducingPoints
 D = 2
 N = 50
@@ -15,24 +16,24 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
     p = scatter(getindex.(x, 1), getindex.(x, 2), 
         label = "Original Data",
         color = :black, 
-        markersize = 6,
+        markersize = 7,
         markerstrokewidth = 0,
         xlims = [0, 1.], ylims = [0., 1.])
 
     scatter!(p, getindex.(Z,1), getindex.(Z, 2), 
-        marker = :star6, 
-        markersize = 6, 
+        marker = :xcross, 
+        markersize = 4, 
         color = :orangered3,
         label = "Inducing Points Z")
         
     if !isnothing(Z₂)
         scatter!(p, getindex.(x₂,1), getindex.(x₂, 2), 
-            markersize = 6, 
+            markersize = 7, 
             color = :grey42,
             label = "Additional Data")
         scatter!(p, getindex.(Z₂,1), getindex.(Z₂, 2), 
-            marker = :xcross, 
-            markersize = 6, 
+            marker = :cross, 
+            markersize = 4, 
             color = :seagreen,
             label = "Updated Z")
     end
