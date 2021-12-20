@@ -8,9 +8,9 @@ using InducingPoints
 D = 2
 N = 50
 M = 10
-x = [rand(D) for _ in 1:N]
+x = [rand(D) .* [0.8, 1.0] for _ in 1:N]
 N₂ = 25
-x₂ = [rand(D) for _ in 1:N₂] .* 0.25
+x₂ = [rand(D) .* [0.2, 1.0] + [0.8, 0.0] for _ in 1:N₂]
 
 function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
     p = scatter(getindex.(x, 1), getindex.(x, 2), 
