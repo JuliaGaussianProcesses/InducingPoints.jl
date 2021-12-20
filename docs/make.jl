@@ -14,4 +14,4 @@ makedocs(;
     pages=["Home" => "index.md"],
 )
 
-deploydocs(; repo="github.com/JuliaGaussianProcesses/InducingPoints.jl")
+deploydocs(; repo="github.com/JuliaGaussianProcesses/InducingPoints.jl", push_preview=true)
