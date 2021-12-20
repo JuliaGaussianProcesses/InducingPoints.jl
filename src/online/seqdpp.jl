@@ -7,6 +7,12 @@ struct SeqDPP <: OnIPSA end
 
 Base.show(io::IO, ::SeqDPP) = print(io, "Sequential DPP")
 
+"""
+     inducingpoints([rng::AbstractRNG], alg::SeqDPP, X::AbstractVector; kernel::Kernel)
+     inducingpoints([rng::AbstractRNG], alg::SeqDPP, X::AbstractMatrix; obsdim=1, kernel::Kernel)
+
+Select inducing points according using Sequential Determinantal Point Processes. Requires as additional keyword argument the `kernel`.
+"""
 function inducingpoints(
     rng::AbstractRNG,
     ::SeqDPP,

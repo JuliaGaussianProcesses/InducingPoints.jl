@@ -42,6 +42,12 @@ function OIPS(kmax::Int, η::T=0.98, kmin::Real=10) where {T<:Real}
     return OIPS(T[0.95, sqrt(0.95)], kmax, kmin, η)
 end
 
+"""
+     inducingpoints([rng::AbstractRNG], alg::OIPS, X::AbstractVector; kernel::Kernel)
+     inducingpoints([rng::AbstractRNG], alg::OIPS, X::AbstractMatrix; obsdim=1, kernel::Kernel)
+
+Select inducing points according using the Greedy algorithm. Requires as additional keyword argument the `kernel`.
+"""
 function inducingpoints(
     rng::AbstractRNG,
     alg::OIPS,
@@ -70,6 +76,12 @@ function updateZ!(
     return add_point!(rng, Z, alg, X, kernel)
 end
 
+@doc raw"""
+    updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OIPS, X::AbstractVector; kernel::Kernel)
+
+Update inducing points `Z` with data `X` and the OnlineIPSelection algorithm. Requires the `kernel` as an 
+additional keyword argument. 
+"""
 function updateZ(
     rng::AbstractRNG,
     Z::AbstractVector,
