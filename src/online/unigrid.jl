@@ -15,9 +15,9 @@ Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.m).
 function inducingpoints(
     ::AbstractRNG,
     alg::UniGrid,
-    X::Union{AbstractVector{<:Real},AbstractVector{<:AbstractVector{<:Real}}};
+    X::AbstractVector{T};
     kwargs...,
-)
+) where {T}
     ndim = length(first(X)) # Take the dimensionality
     bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
     Z = map(bounds) do lims
@@ -25,7 +25,12 @@ function inducingpoints(
     end
     tmp = Iterators.product(Z...)
     Zm = reshape(collect(Iterators.flatten(tmp)), ndim, :)
-    return ColVecs(Zm)
+
+    if T <: Real
+        return Zm[:]
+    else
+        return ColVecs(Zm)
+    end
 end
 
 function updateZ!(
@@ -40,7 +45,12 @@ function updateZ!(
         return LinRange(x_start, x_stop, alg.m) # readapt bounds
     end
     tmp = Iterators.product(newZ...)
-    Z.X[:] = collect(Iterators.flatten(tmp))
+
+    if Z isa AbstractVector{<:Real}
+        Z[:] = collect(Iterators.flatten(tmp))
+    elseif Z isa ColVecs
+        Z.X[:] = collect(Iterators.flatten(tmp))
+    end
     return Z
 end
 
