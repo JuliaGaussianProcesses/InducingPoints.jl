@@ -1,7 +1,7 @@
 name = "InducingPoints"
 uuid = "b4bd816d-b975-4295-ac05-5f2992945579"
 authors = ["Théo Galy-Fajou <theo.galyfajou@gmail.com> and JuliaGaussianProcesses"]
-version = "0.2.9"
+version = "0.2.10"
 
 [deps]
 AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
@@ -15,7 +15,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
-AbstractGPs = "0.3, 0.5"
+AbstractGPs = "0.3, 0.4, 0.5"
 Clustering = "0.14"
 DataStructures = "0.17, 0.18"
 DeterminantalPointProcesses = "0.2"
