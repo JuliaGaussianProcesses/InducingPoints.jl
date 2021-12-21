@@ -3,7 +3,10 @@
     OIPS(kmax, η=0.98, kmin=10)
 
 Online Inducing Points Selection.
-Method from the paper include reference here.
+Method from [1]. Requires passing the `kernel` as keyword argument to `inducingpoints`.
+
+[1] Galy-Fajou, T. & Opper, M Adaptive Inducing Points Selection for Gaussian Processes. arXiv:2107.10066v1 (2021).
+
 """
 struct OnlineIPSelection{T,Tv<:AbstractVector{T},Tk} <: OnIPSA
     ρs::Tv # Vector of two elements corresponding to ρ_accept and ρ_remove
@@ -39,6 +42,12 @@ function OIPS(kmax::Int, η::T=0.98, kmin::Real=10) where {T<:Real}
     return OIPS(T[0.95, sqrt(0.95)], kmax, kmin, η)
 end
 
+"""
+     inducingpoints([rng::AbstractRNG], alg::OIPS, X::AbstractVector; kernel::Kernel)
+     inducingpoints([rng::AbstractRNG], alg::OIPS, X::AbstractMatrix; obsdim=1, kernel::Kernel)
+
+Select inducing points according using Online Inducing Points Selection. Requires as additional keyword argument the `kernel`.
+"""
 function inducingpoints(
     rng::AbstractRNG,
     alg::OIPS,
@@ -67,6 +76,12 @@ function updateZ!(
     return add_point!(rng, Z, alg, X, kernel)
 end
 
+@doc raw"""
+    updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OIPS, X::AbstractVector; kernel::Kernel)
+
+Update inducing points `Z` with data `X` and the OnlineIPSelection algorithm. Requires the `kernel` as an 
+additional keyword argument. 
+"""
 function updateZ(
     rng::AbstractRNG,
     Z::AbstractVector,

@@ -1,11 +1,11 @@
 """
-    GreedyIP(m::Int, s::Int)
+    Greedy(m::Int, s::Int)
 
  - `m` is the desired number of inducing points
  - `s` is the minibatch size on which to select a new inducing point
 
 Greedy approach first proposed by Titsias[1].
-Algorithm loops over minibatches of data and select the best ELBO improvement.
+Algorithm loops over minibatches of data and select the best ELBO improvement. Requires passing outputs `y`, the `kernel` and the `noise` as keyword arguments to `inducingpoints`.
 
 [1] Titsias, M. Variational Learning of Inducing Variables in Sparse Gaussian Processes. Aistats 5, 567–574 (2009).
 """
@@ -19,6 +19,14 @@ struct Greedy <: OffIPSA
     end
 end
 
+"""
+     inducingpoints([rng::AbstractRNG], alg::Greedy, X::AbstractVector; 
+        y::AbstractVector, kernel::Kernel, noise::Real)
+     inducingpoints([rng::AbstractRNG], alg::Greedy, X::AbstractMatrix; 
+        obsdim=1, y::AbstractVector, kernel::Kernel, noise::Real)
+
+Select inducing points according using the Greedy algorithm. Requires as additional keyword arguments the outputs `y`, the `kernel` and the `noise`.
+"""
 function inducingpoints(
     rng::AbstractRNG,
     alg::Greedy,
@@ -67,7 +75,9 @@ function greedy_ip(
         )
         for j in d # Loop over every sample and evaluate the elbo addition with each new sample
             ℐᵢₚ₊ = union(ℐᵢₚ, j)
-            L = AbstractGPs.elbo(f(X[collect(ℐₜₑₛₜ)], noise), y[collect(ℐₜₑₛₜ)], f(X[collect(ℐᵢₚ₊)]))
+            L = AbstractGPs.elbo(
+                f(X[collect(ℐₜₑₛₜ)], noise), y[collect(ℐₜₑₛₜ)], f(X[collect(ℐᵢₚ₊)])
+            )
             if L > best_L
                 best_i = j
                 best_L = L

@@ -50,10 +50,10 @@ const OnIPSA = OnlineInducingPointsSelectionAlg
 
 ## Wrapper for matrices
 """
-     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractVector; kwargs...)
-     inducingpoints([rng::AbstractRNG], alg::OffIPSA, X::AbstractMatrix; obsdim=1, kwargs...)
+     inducingpoints([rng::AbstractRNG], alg::AIPSA, X::AbstractVector; [kwargs...])
+     inducingpoints([rng::AbstractRNG], alg::AIPSA, X::AbstractMatrix; obsdim=1, [kwargs...])
 
-Select inducing points according to the algorithm `alg`.
+Select inducing points according to the algorithm `alg`. For some algorithms, additional keyword arguments are required. 
 """
 inducingpoints
 
@@ -74,9 +74,10 @@ end
 
 ## Online IP selection functions 
 @doc raw"""
-    updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; kwargs...)
+    updateZ!([rng::AbstractRNG], Z::AbstractVector, alg::OnIPSA, X::AbstractVector; [kwargs...])
 
-Update inducing points `Z` with data `X` and algorithm `alg`
+Update inducing points `Z` with data `X` and algorithm `alg`. Requires additional keyword arguments
+for some algorithms. Also see `InducingPoints`.
 """
 updateZ!
 
