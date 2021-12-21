@@ -16,24 +16,27 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
     p = scatter(getindex.(x, 1), getindex.(x, 2), 
         label = "Original Data",
         color = :black, 
-        markersize = 7,
+        markersize = 8,
         markerstrokewidth = 0,
         xlims = [0, 1.], ylims = [0., 1.])
 
     scatter!(p, getindex.(Z,1), getindex.(Z, 2), 
-        marker = :xcross, 
-        markersize = 4, 
-        color = :orangered3,
+        marker = :circle, 
+        markersize = 8,
+        markeralpha = 0,
+        markerstrokewidth = 3,
+        markerstrokealpha = 1,
+        markerstrokecolor = :orangered3,
         label = "Inducing Points Z")
         
     if !isnothing(Z₂)
         scatter!(p, getindex.(x₂,1), getindex.(x₂, 2), 
-            markersize = 7, 
+            markersize = 8, 
             color = :grey42,
             label = "Additional Data")
         scatter!(p, getindex.(Z₂,1), getindex.(Z₂, 2), 
-            marker = :cross, 
-            markersize = 4, 
+            marker = :xcross, 
+            markersize = 5.5, 
             color = :seagreen,
             label = "Updated Z")
     end
