@@ -13,10 +13,7 @@ end
 Base.show(io::IO, Z::UniGrid) = print(io, "Uniform grid with side length $(Z.m).")
 
 function inducingpoints(
-    ::AbstractRNG,
-    alg::UniGrid,
-    X::AbstractVector{T};
-    kwargs...,
+    ::AbstractRNG, alg::UniGrid, X::AbstractVector{T}; kwargs...
 ) where {T}
     ndim = length(first(X)) # Take the dimensionality
     bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
@@ -54,7 +51,9 @@ function updateZ!(
     return Z
 end
 
-function updateZ(rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...)
+function updateZ(
+    rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...
+)
     Zn = deepcopy(Z)
     return updateZ!(rng, Zn, alg, X; kwargs...)
 end
