@@ -4,7 +4,7 @@
 ## Arguments
 - `m::Int`: Number of inducing points
 
-Uniform sampling of a subset of `m` points ofthe data.
+Uniform sampling of a subset of `m` points of the data.
 """
 struct RandomSubset <: OffIPSA
     m::Int
@@ -14,6 +14,12 @@ struct RandomSubset <: OffIPSA
     end
 end
 
+"""
+     inducingpoints([rng::AbstractRNG], alg::RandomSubset, X::AbstractVector; [weights::Vector=nothing])
+     inducingpoints([rng::AbstractRNG], alg::RandomSubset, X::AbstractMatrix; obsdim=1, [weights::Vector=nothing])
+
+Select inducing points by taking a Random Subset. Optionally accepts a weight vector for the inputs `X`.
+"""
 function inducingpoints(
     rng::AbstractRNG, alg::RandomSubset, X::AbstractVector; weights=nothing, kwargs...
 )
