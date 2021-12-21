@@ -23,18 +23,28 @@ function inducingpoints(
     Z = map(bounds) do lims
         LinRange(lims..., alg.m)
     end
-    return Z
+    tmp = Iterators.product(Z...)
+    Zm = reshape(collect(Iterators.flatten(tmp)), ndim, :)
+    return ColVecs(Zm)
 end
 
 function updateZ!(
     ::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...
 )
-    ndim = length(Z)
+    ndim = length(first(Z))
+    old_bounds = collect(zip(Z[1], Z[end]))
     new_bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
-    map!(Z, Z, new_bounds) do Z_d, new_b
-        x_start = min(Z_d.start, new_b[1]) # Find the new limits
-        x_stop = max(Z_d.stop, new_b[2])
+    newZ = map(old_bounds, new_bounds) do old_b, new_b
+        x_start = min(old_b[1], new_b[1]) # Find the new limits
+        x_stop = max(old_b[2], new_b[2])
         return LinRange(x_start, x_stop, alg.m) # readapt bounds
     end
+    tmp = Iterators.product(newZ...)
+    Z.X[:] = collect(Iterators.flatten(tmp))
     return Z
+end
+
+function updateZ(rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...)
+    Zn = deepcopy(Z)
+    return updateZ!(rng, Zn, alg, X; kwargs...)
 end
