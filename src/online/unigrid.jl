@@ -43,3 +43,29 @@ function updateZ(rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractV
     Zn = deepcopy(Z)
     return updateZ!(rng, Zn, alg, X)
 end
+
+export UniformGrid
+struct UniformGrid{N, T} <: AbstractVector{T} 
+    proditer::Iterators.ProductIterator{NTuple{N, LinRange{T, Int64}}}
+
+    function UniformGrid(proditer::Iterators.ProductIterator{NTuple{N, LinRange{T, Int64}}}) where {N, T}
+        new{N,T}(proditer)
+    end
+end
+
+
+
+import Base: getindex
+Base.getindex(ug::UniformGrid, i) = collect(first(Iterators.drop(ug.proditer, i)))
+
+
+### show still this need more improvement
+Base.show(io::IO, ug::UniformGrid) = print(io, "Lazy $(length.(ug.proditer.iterators)) uniform grid")
+
+Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid) = Base.show(io, ug)
+
+import Base: length, size
+Base.length(ug::UniformGrid) = prod(length.(ug.proditer.iterators))
+
+# alternative: (typeof(t).parameters[1], prod(length.(ug.proditer.iterators)))
+Base.size(ug::UniformGrid) = length.(ug.proditer.iterators)
