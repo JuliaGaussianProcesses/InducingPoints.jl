@@ -53,12 +53,10 @@ struct UniformGrid{N, T} <: AbstractVector{T}
     end
 end
 
-
-
-import Base: getindex, broadcastable, eachindex, length, size
+import Base: getindex, broadcastable, eachindex, length, size, enumerate
 Base.getindex(ug::UniformGrid, i) = collect(first(Iterators.drop(ug.proditer, i-1)))
 
-Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)
+Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)[:]
 
 Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
 
@@ -66,8 +64,18 @@ Base.length(ug::UniformGrid) = prod(length.(ug.proditer.iterators))
 # alternative: (typeof(t).parameters[1], prod(length.(ug.proditer.iterators)))
 Base.size(ug::UniformGrid) = length.(ug.proditer.iterators)
 
+enumerate(ug::UniformGrid) = enumerate(ug.proditer)
 
-### show still this need more improvement
+import KernelFunctions: pairwise, pairwise!
+function pairwise(d::PreMetric, x::UniformGrid)
+    return KernelFunctions.Distances_pairwise(d, x)
+end
+
+function pairwise!(out::AbstractMatrix, d::PreMetric, x::UniformGrid)
+    return KernelFunctions.Distances.pairwise!(out, d, x)
+end
+
+### show still needs more improvement, maybe
 Base.show(io::IO, ug::UniformGrid) = print(io, "Lazy $(length.(ug.proditer.iterators)) uniform grid")
 
 Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid) = Base.show(io, ug)
