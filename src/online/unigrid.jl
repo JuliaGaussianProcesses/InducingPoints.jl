@@ -55,8 +55,16 @@ end
 
 
 
-import Base: getindex
-Base.getindex(ug::UniformGrid, i) = collect(first(Iterators.drop(ug.proditer, i)))
+import Base: getindex, broadcastable, eachindex, length, size
+Base.getindex(ug::UniformGrid, i) = collect(first(Iterators.drop(ug.proditer, i-1)))
+
+Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)
+
+Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
+
+Base.length(ug::UniformGrid) = prod(length.(ug.proditer.iterators))
+# alternative: (typeof(t).parameters[1], prod(length.(ug.proditer.iterators)))
+Base.size(ug::UniformGrid) = length.(ug.proditer.iterators)
 
 
 ### show still this need more improvement
@@ -64,8 +72,3 @@ Base.show(io::IO, ug::UniformGrid) = print(io, "Lazy $(length.(ug.proditer.itera
 
 Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid) = Base.show(io, ug)
 
-import Base: length, size
-Base.length(ug::UniformGrid) = prod(length.(ug.proditer.iterators))
-
-# alternative: (typeof(t).parameters[1], prod(length.(ug.proditer.iterators)))
-Base.size(ug::UniformGrid) = length.(ug.proditer.iterators)
