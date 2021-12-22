@@ -7,4 +7,4 @@
     alg = UniGrid(nInd)
     @test repr(alg) == "Uniform grid with side length $nInd."
     test_Zalg(alg)
-end 
+end

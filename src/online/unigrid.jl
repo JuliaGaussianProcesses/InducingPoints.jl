@@ -23,48 +23,58 @@ function inducingpoints(
     Z = map(bounds) do lims
         LinRange(lims..., alg.m)
     end
-    return Z
+    proditer = Iterators.product(Z...)
+    return UniformGrid(proditer)
 end
 
 function updateZ!(
     ::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...
 )
-    ndim = length(Z)
+    ndim = length(X[1])
     new_bounds = [extrema(x -> getindex(x, i), X) for i in 1:ndim]
-    map!(Z, Z, new_bounds) do Z_d, new_b
-        x_start = min(Z_d.start, new_b[1]) # Find the new limits
-        x_stop = max(Z_d.stop, new_b[2])
-        return LinRange(x_start, x_stop, alg.m) # readapt bounds
+    Zn = map(Z.proditer.iterators, new_bounds) do old_Z, new_b
+        x_start = min(old_Z.start, new_b[1])
+        x_stop = max(old_Z.stop, new_b[2])
+        return LinRange(x_start, x_stop, alg.m)
     end
+    Z.proditer = Iterators.product(Zn...)
     return Z
 end
 
-function updateZ(rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector)
+function updateZ(
+    rng::AbstractRNG, Z::AbstractVector, alg::UniGrid, X::AbstractVector; kwargs...
+)
     Zn = deepcopy(Z)
-    return updateZ!(rng, Zn, alg, X)
+    return updateZ!(rng, Zn, alg, X; kwargs...)
 end
 
 export UniformGrid
-struct UniformGrid{N, T} <: AbstractVector{T} 
-    proditer::Iterators.ProductIterator{NTuple{N, LinRange{T, Int64}}}
+mutable struct UniformGrid{N,T} <: AbstractVector{T}
+    proditer::Iterators.ProductIterator{NTuple{N,LinRange{T,Int64}}}
 
-    function UniformGrid(proditer::Iterators.ProductIterator{NTuple{N, LinRange{T, Int64}}}) where {N, T}
-        new{N,T}(proditer)
+    function UniformGrid(
+        proditer::Iterators.ProductIterator{NTuple{N,LinRange{T,Int64}}}
+    ) where {N,T}
+        return new{N,T}(proditer)
     end
 end
 
-import Base: getindex, broadcastable, eachindex, length, size, enumerate
-Base.getindex(ug::UniformGrid, i) = collect(first(Iterators.drop(ug.proditer, i-1)))
+import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype
+Base.getindex(ug::UniformGrid, i) = getelement(first(Iterators.drop(ug.proditer, i - 1)))
+getelement(x::NTuple{1,<:Real}) = only(x)
+getelement(x::NTuple) = collect(x)
 
 Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)[:]
 
 Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
 
-Base.length(ug::UniformGrid) = prod(length.(ug.proditer.iterators))
+Base.length(ug::UniformGrid) = prod(length, ug.proditer.iterators)
 # alternative: (typeof(t).parameters[1], prod(length.(ug.proditer.iterators)))
-Base.size(ug::UniformGrid) = length.(ug.proditer.iterators)
+Base.size(ug::UniformGrid) = (prod(length, ug.proditer.iterators),)
 
-enumerate(ug::UniformGrid) = enumerate(ug.proditer)
+Base.enumerate(ug::UniformGrid) = Base.enumerate(ug.proditer)
+
+Base.eltype(ug::UniformGrid) = typeof(ug[1])
 
 import KernelFunctions: pairwise, pairwise!
 function pairwise(d::PreMetric, x::UniformGrid)
@@ -75,8 +85,13 @@ function pairwise!(out::AbstractMatrix, d::PreMetric, x::UniformGrid)
     return KernelFunctions.Distances.pairwise!(out, d, x)
 end
 
-### show still needs more improvement, maybe
-Base.show(io::IO, ug::UniformGrid) = print(io, "Lazy $(length.(ug.proditer.iterators)) uniform grid")
+## show still needs more improvement, maybe
+function Base.show(io::IO, ug::UniformGrid)
+    return print(io, "Lazy $(length.(ug.proditer.iterators)) uniform grid")
+end
 
-Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid) = Base.show(io, ug)
-
+function Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid)
+    println("$(length.(ug.proditer.iterators)) uniform grid with edges")
+    pr(iter) = println([iter[1], iter[end]])
+    return pr.(ug.proditer.iterators)
+end
