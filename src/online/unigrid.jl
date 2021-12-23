@@ -53,12 +53,12 @@ mutable struct UniformGrid{T,Titer} <: AbstractVector{T}
     proditer::Titer
 end
 
-    function UniformGrid(
-        proditer::Iterators.ProductIterator
-    )
-        T = eltype(first(proditer.iterators))
-        return new{T,typeof(proditer)}(proditer)
-    end
+function UniformGrid(
+    proditer::Iterators.ProductIterator
+)
+    T = eltype(first(proditer.iterators))
+    return UniformGrid{T,typeof(proditer)}(proditer)
+end
 
 import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype
 Base.getindex(ug::UniformGrid, i) = getelement(first(Iterators.drop(ug.proditer, i - 1)))
