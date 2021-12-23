@@ -15,5 +15,5 @@
     @test length(Z) == M
     @test length(first(Z)) == D
 
-    test_Zalg
+    test_Zalg(alg)
 end

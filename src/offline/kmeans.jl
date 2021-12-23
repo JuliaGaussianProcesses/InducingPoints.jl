@@ -57,8 +57,8 @@ function kmeans_ip(
     C = kmeans_seeding(rng, X, nC, metric, nMarkov)
     C = reduce(hcat, C)
     kmeans!(reduce(hcat, X), C; weights=weights, tol=tol, distance=metric)
-    if T isa Real
-        return C
+    if T <: Real
+        return vec(C)
     else
         return ColVecs(C)
     end
