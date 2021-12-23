@@ -76,7 +76,7 @@ function kmeans_seeding(
     # Preprocessing, 
     init = rand(rng, 1:nsamples) # Sample first random center
     C = collect.(X[init:init]) # Initialize the collection of centroids
-    q = vec(pairwise(metric, X, C)) # Create the pairwise values between the data and the first centroid
+    q = vec(pairwise(metric, X, copy(C))) # Create the pairwise values between the data and the first centroid
     q = Weights(q / sum(q) .+ 1.0 / (2 * nsamples), 1) # Create weights to work with
     for _ in 2:nC
         x = X[sample(rng, q)] # weighted sampling,
