@@ -57,8 +57,8 @@ function kmeans_ip(
     C = kmeans_seeding(rng, X, nC, metric, nMarkov)
     C = reduce(hcat, C)
     kmeans!(reduce(hcat, X), C; weights=weights, tol=tol, distance=metric)
-    if T isa Real
-        return C
+    if T <: Real
+        return vec(C)
     else
         return ColVecs(C)
     end
@@ -76,7 +76,7 @@ function kmeans_seeding(
     # Preprocessing, 
     init = rand(rng, 1:nsamples) # Sample first random center
     C = collect.(X[init:init]) # Initialize the collection of centroids
-    q = vec(pairwise(metric, X, C)) # Create the pairwise values between the data and the first centroid
+    q = vec(pairwise(metric, X, copy(C))) # Create the pairwise values between the data and the first centroid
     q = Weights(q / sum(q) .+ 1.0 / (2 * nsamples), 1) # Create weights to work with
     for _ in 2:nC
         x = X[sample(rng, q)] # weighted sampling,
