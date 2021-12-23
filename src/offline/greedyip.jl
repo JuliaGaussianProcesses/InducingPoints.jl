@@ -76,7 +76,9 @@ function greedy_ip(
         for j in d # Loop over every sample and evaluate the elbo addition with each new sample
             ℐᵢₚ₊ = union(ℐᵢₚ, j)
             L = AbstractGPs.elbo(
-                f(X[collect(ℐₜₑₛₜ)], noise), y[collect(ℐₜₑₛₜ)], f(X[collect(ℐᵢₚ₊)])
+                AbstractGPs.VFE(f(X[collect(ℐᵢₚ₊)])),
+                f(X[collect(ℐₜₑₛₜ)], noise),
+                y[collect(ℐₜₑₛₜ)],
             )
             if L > best_L
                 best_i = j
