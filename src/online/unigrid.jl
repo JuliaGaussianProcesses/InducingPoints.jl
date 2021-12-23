@@ -49,15 +49,16 @@ function updateZ(
 end
 
 export UniformGrid
-mutable struct UniformGrid{N,T} <: AbstractVector{T}
-    proditer::Iterators.ProductIterator{NTuple{N,LinRange{T,Int64}}}
+mutable struct UniformGrid{T,Titer} <: AbstractVector{T}
+    proditer::Titer
+end
 
     function UniformGrid(
-        proditer::Iterators.ProductIterator{NTuple{N,LinRange{T,Int64}}}
-    ) where {N,T}
-        return new{N,T}(proditer)
+        proditer::Iterators.ProductIterator
+    )
+        T = eltype(first(proditer.iterators))
+        return new{T,typeof(proditer)}(proditer)
     end
-end
 
 import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype
 Base.getindex(ug::UniformGrid, i) = getelement(first(Iterators.drop(ug.proditer, i - 1)))
