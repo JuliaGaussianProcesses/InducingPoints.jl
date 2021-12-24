@@ -34,6 +34,9 @@ export StreamKmeans
 export UniGrid
 export Webscale
 
+## Custom output object
+export UniformGrid
+
 const jitt = 1e-5
 
 abstract type AbstractInducingPointsSelectionAlg end

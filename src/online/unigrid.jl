@@ -48,7 +48,12 @@ function updateZ(
     return updateZ!(rng, Zn, alg, X; kwargs...)
 end
 
-export UniformGrid
+"""
+    UniformGrid{T,Titer} <: AbstractVector{T}
+
+A memory-efficient custom object representing a wrapper around a `Iterators.ProductIterator`.
+Supports broadcasting and other relevant array methods, and avoids explicitly computing all points on the grid.  
+"""
 mutable struct UniformGrid{T,Titer} <: AbstractVector{T}
     proditer::Titer
 end
@@ -89,7 +94,7 @@ Base.IndexStyle(::UniformGrid) = IndexLinear()
 
 ## show needs more improvement, maybe
 function Base.show(io::IO, ug::UniformGrid)
-    return print(io, "Lazy $(length.(ug.proditer.iterators)) uniform grid")
+    return print(io, "$(length.(ug.proditer.iterators)) uniform grid")
 end
 
 function Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid)
