@@ -53,40 +53,28 @@ mutable struct UniformGrid{T,Titer} <: AbstractVector{T}
     proditer::Titer
 end
 
-function UniformGrid(
-    proditer::Iterators.ProductIterator
-)
+function UniformGrid(proditer::Iterators.ProductIterator{NTuple{N,S}}) where {N,S}
     T = Vector{eltype(first(proditer.iterators))}
     return UniformGrid{T,typeof(proditer)}(proditer)
 end
 
 import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype
-Base.getindex(ug::UniformGrid, i) = getelement(first(Iterators.drop(ug.proditer, i - 1)))
-getelement(x::NTuple{1,<:Real}) = only(x)
-getelement(x::NTuple) = collect(x)
+Base.getindex(ug::UniformGrid, i) = _getelement(first(Iterators.drop(ug.proditer, i - 1)))
+_getelement(x::NTuple{1,<:Real}) = only(x)
+_getelement(x::NTuple) = collect(x)
 
 Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)[:]
 
 Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
 
 Base.length(ug::UniformGrid) = prod(length, ug.proditer.iterators)
-# alternative: (typeof(t).parameters[1], prod(length.(ug.proditer.iterators)))
 Base.size(ug::UniformGrid) = (prod(length, ug.proditer.iterators),)
 
 Base.enumerate(ug::UniformGrid) = Base.enumerate(ug.proditer)
 
 Base.eltype(ug::UniformGrid) = typeof(ug[1])
 
-import KernelFunctions: pairwise, pairwise!
-function KernelFunctions.pairwise(d::PreMetric, x::UniformGrid)
-    return KernelFunctions.Distances_pairwise(d, x)
-end
-
-function KernelFunctions.pairwise!(out::AbstractMatrix, d::PreMetric, x::UniformGrid)
-    return KernelFunctions.Distances.pairwise!(out, d, x)
-end
-
-## show still needs more improvement, maybe
+## show needs more improvement, maybe
 function Base.show(io::IO, ug::UniformGrid)
     return print(io, "Lazy $(length.(ug.proditer.iterators)) uniform grid")
 end
