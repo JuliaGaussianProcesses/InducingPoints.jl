@@ -56,7 +56,7 @@ end
 function UniformGrid(
     proditer::Iterators.ProductIterator
 )
-    T = eltype(first(proditer.iterators))
+    T = Vector{eltype(first(proditer.iterators))}
     return UniformGrid{T,typeof(proditer)}(proditer)
 end
 
@@ -78,11 +78,11 @@ Base.enumerate(ug::UniformGrid) = Base.enumerate(ug.proditer)
 Base.eltype(ug::UniformGrid) = typeof(ug[1])
 
 import KernelFunctions: pairwise, pairwise!
-function pairwise(d::PreMetric, x::UniformGrid)
+function KernelFunctions.pairwise(d::PreMetric, x::UniformGrid)
     return KernelFunctions.Distances_pairwise(d, x)
 end
 
-function pairwise!(out::AbstractMatrix, d::PreMetric, x::UniformGrid)
+function KernelFunctions.pairwise!(out::AbstractMatrix, d::PreMetric, x::UniformGrid)
     return KernelFunctions.Distances.pairwise!(out, d, x)
 end
 
