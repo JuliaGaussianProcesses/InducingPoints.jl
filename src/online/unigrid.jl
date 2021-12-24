@@ -59,16 +59,20 @@ function UniformGrid(proditer::Iterators.ProductIterator{NTuple{N,S}}) where {N,
 end
 
 import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype, IndexStyle
-Base.getindex(ug::UniformGrid, i) = _getelement(first(Iterators.drop(ug.proditer, i - 1)))
+
 _getelement(x::NTuple{1,<:Real}) = only(x)
 _getelement(x::NTuple) = collect(x)
 
+Base.getindex(ug::UniformGrid, i::Integer) = _getelement(first(Iterators.drop(ug.proditer, i - 1)))
+
 function Base.getindex(ug::UniformGrid, r::UnitRange)
     return [
-        collect(x) for
+        _getelement(x) for
         x in Iterators.take(Iterators.drop(ug.proditer, first(r) - 1), length(r))
     ]
 end
+
+Base.getindex(ug::UniformGrid, ::Colon) = Base.getindex(ug, 1:length(ug))
 
 Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)[:]
 
