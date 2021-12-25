@@ -23,7 +23,7 @@
         @test length(ug) == length(proditer)
         @test size(ug) == (length(proditer),)
 
-        @test [(i,a) for (i,a) in enumerate(ug)] == [(i,a) for (i,a) in enumerate(gridp)]
+        @test [(i, a) for (i, a) in enumerate(ug)] == [(i, a) for (i, a) in enumerate(gridp)]
     end
 
     ### 1-dim grid
@@ -46,7 +46,8 @@
 
         testUG(proditer, gridp, ug)
 
-        @test repr("text/plain", ug) == "(5, 5) uniform grid with edges\n[1.0, 5.0]\n[6.0, 10.0]\n"
+        @test repr("text/plain", ug) ==
+            "(5, 5) uniform grid with edges\n[1.0, 5.0]\n[6.0, 10.0]\n"
         @test repr(ug) == "(5, 5) uniform grid"
     end
 end

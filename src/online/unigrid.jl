@@ -88,8 +88,8 @@ Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
 Base.length(ug::UniformGrid) = prod(length, ug.proditer.iterators)
 Base.size(ug::UniformGrid) = (prod(length, ug.proditer.iterators),)
 
-function Base.iterate(ug::UniformGrid, state...) 
-    r =  Base.iterate(ug.proditer, state...) 
+function Base.iterate(ug::UniformGrid, state...)
+    r = Base.iterate(ug.proditer, state...)
     r === nothing && return nothing
     return (_getelement(r[1]), r[2])
 end
