@@ -24,6 +24,10 @@
         @test size(ug) == (length(proditer),)
 
         @test [(i, a) for (i, a) in enumerate(ug)] == [(i, a) for (i, a) in enumerate(gridp)]
+
+        # kernel matrix
+        ker = SqExponentialKernel()
+        @test kernelmatrix(ker, ug) == kernelmatrix(ker, gridp)
     end
 
     ### 1-dim grid
