@@ -10,7 +10,7 @@
 
     ### 1-dim grid
     @testset "1-dim UniformGrid" begin
-        proditer = Iterators.product(1.:5.)
+        proditer = Iterators.product(1.0:5.0)
         gridp = [only(collect(x)) for x in collect(proditer)]
         ug = UniformGrid(proditer)
 
@@ -22,12 +22,12 @@
         @test IndexStyle(ug) isa IndexLinear
 
         # broadcast
-        @test norm.(ug) == norm.(gridp)
+        @test sum.(ug) == sum.(gridp)
     end
-    
+
     ### >1-dim grid
     @testset ">1-dim grid" begin
-        proditer = Iterators.product(1.:5., 6.:10.)
+        proditer = Iterators.product(1.0:5.0, 6.0:10.0)
         gridp = collect.(collect(proditer))[:]
         ug = UniformGrid(proditer)
 
@@ -39,7 +39,6 @@
         @test IndexStyle(ug) isa IndexLinear
 
         # broadcast
-        @test norm.(ug) == norm.(gridp)
+        @test sum.(ug) == sum.(gridp)
     end
-
 end

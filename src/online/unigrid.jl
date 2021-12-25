@@ -68,7 +68,9 @@ import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype
 _getelement(x::NTuple{1,<:Real}) = only(x)
 _getelement(x::NTuple) = collect(x)
 
-Base.getindex(ug::UniformGrid, i::Integer) = _getelement(first(Iterators.drop(ug.proditer, i - 1)))
+function Base.getindex(ug::UniformGrid, i::Integer)
+    return _getelement(first(Iterators.drop(ug.proditer, i - 1)))
+end
 
 function Base.getindex(ug::UniformGrid, r::UnitRange)
     return [
