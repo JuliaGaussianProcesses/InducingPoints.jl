@@ -63,7 +63,7 @@ function UniformGrid(proditer::Iterators.ProductIterator{NTuple{N,S}}) where {N,
     return UniformGrid{T,typeof(proditer)}(proditer)
 end
 
-import Base: getindex, broadcastable, eachindex, length, size, enumerate, eltype, IndexStyle
+import Base: getindex, broadcastable, eachindex, length, size, iterate, eltype, IndexStyle
 
 _getelement(x::NTuple{1,<:Real}) = only(x)
 _getelement(x::NTuple) = collect(x)
@@ -88,7 +88,11 @@ Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
 Base.length(ug::UniformGrid) = prod(length, ug.proditer.iterators)
 Base.size(ug::UniformGrid) = (prod(length, ug.proditer.iterators),)
 
-Base.enumerate(ug::UniformGrid) = Base.enumerate(ug.proditer)
+function Base.iterate(ug::UniformGrid, state...) 
+    r =  Base.iterate(ug.proditer, state...) 
+    r === nothing && return nothing
+    return (_getelement(r[1]), r[2])
+end
 
 Base.eltype(ug::UniformGrid) = typeof(ug[1])
 
@@ -100,7 +104,7 @@ function Base.show(io::IO, ug::UniformGrid)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", ug::UniformGrid)
-    println("$(length.(ug.proditer.iterators)) uniform grid with edges")
-    pr(iter) = println([iter[1], iter[end]])
+    println(io, "$(length.(ug.proditer.iterators)) uniform grid with edges")
+    pr(iter) = println(io, [iter[1], iter[end]])
     return pr.(ug.proditer.iterators)
 end
