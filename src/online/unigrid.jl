@@ -83,11 +83,10 @@ Base.getindex(ug::UniformGrid, ::Colon) = Base.getindex(ug, 1:length(ug))
 
 Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)[:]
 
-Base.eachindex(ug::UniformGrid) = Base.OneTo(length(ug))
-
 Base.length(ug::UniformGrid) = prod(length, ug.proditer.iterators)
 Base.size(ug::UniformGrid) = (prod(length, ug.proditer.iterators),)
 
+# slows iteration, but makes it consistent with iterating over an AbstractVector
 function Base.iterate(ug::UniformGrid, state...)
     r = Base.iterate(ug.proditer, state...)
     r === nothing && return nothing
