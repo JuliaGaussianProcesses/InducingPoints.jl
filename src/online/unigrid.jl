@@ -81,7 +81,10 @@ end
 
 Base.getindex(ug::UniformGrid, ::Colon) = Base.getindex(ug, 1:length(ug))
 
-Base.broadcastable(ug::UniformGrid) = Base.broadcastable(ug.proditer)[:]
+function Base.broadcastable(ug::UniformGrid)
+    r = similar(1:1, eltype(ug.proditer), length(ug))
+    copyto!(r, ug.proditer)
+end
 
 Base.length(ug::UniformGrid) = prod(length, ug.proditer.iterators)
 Base.size(ug::UniformGrid) = (prod(length, ug.proditer.iterators),)
