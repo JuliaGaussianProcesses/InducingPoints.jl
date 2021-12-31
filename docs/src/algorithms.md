@@ -26,7 +26,7 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
         markeralpha = 0,
         markerstrokewidth = 3,
         markerstrokealpha = 1,
-        markerstrokecolor = :orangered3,
+        markerstrokecolor = RGB(.96, .51, 0.19),
         label = "Inducing Points Z")
         
     if !isnothing(Z₂)
@@ -37,7 +37,7 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
         scatter!(p, getindex.(Z₂,1), getindex.(Z₂, 2), 
             marker = :xcross, 
             markersize = 5.5, 
-            color = :seagreen,
+            color = RGB(0., .57, .88),
             label = "Updated Z")
     end
     return p

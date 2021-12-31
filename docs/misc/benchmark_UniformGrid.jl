@@ -47,7 +47,6 @@ for (i, n) in enumerate(nv)
 end
 
 elbs = ["" ""]
-# cls = [RGB(.96, .51, 0.19) RGB(0., .57, .88)]
 p1 = plot()
 plot!(p1, nv, [sizeug, sizeexpgrid]./1e3, label = ["UniformGrid" "Explicit Grid"],
     xticks = nv, linewidth = 3, legend = :topleft,
