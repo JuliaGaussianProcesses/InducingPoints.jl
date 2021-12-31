@@ -171,6 +171,13 @@ savefig("UniGrid.svg"); nothing # hide
 ```
 ![](UniGrid.svg)
 
+#### [`UniformGrid`](@ref)
+For memory efficieny, InducingPoints.jl provides the custom type [`UniformGrid`](@ref), which is essentially a wrapper around an `Iterators.product`. It functions in many ways like an `AbstractVector`, but does not explicitly store all elements of the grid. Therefore, shown via the example of a two-dimensional grid, the object size only depends on the dimension, not on the number of grid points. 
+
+It is optimized to be very efficient with `kernelmatrix` function provided by `Kernelfunctions.jl`. However, compared to an explicitly stored `Vector` of grid points, it incurs additional overhead when used with other vector operations (illustrated below with the example of broadcasting `sum`).
+
+![](./assets/UniformGrid_bench.svg)
+
 
 ### [`SeqDPP`](@ref) 
 Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditioned on the existing inducing points.
