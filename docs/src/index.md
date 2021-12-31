@@ -41,7 +41,7 @@ end
 
 The Online options are:
 - [`OnlineIPSelection`](@ref) : A method based on distance between inducing points and data
-- [`UniGrid`](@ref) : A regularly-spaced grid whom edges are adapted given the data
+- [`UniGrid`](@ref) : A regularly-spaced grid whom edges are adapted given the data. Uses memory efficient custom type [`UniformGrid`](@ref)
 - [`SeqDPP`](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditioned on the existing inducing points.
 - [`StreamKmeans`](@ref) : An online version of k-means.
 - [`Webscale`](@ref) : Another online version of k-means
