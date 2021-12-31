@@ -1,6 +1,7 @@
 using InducingPoints, KernelFunctions
 using BenchmarkTools
 using Plots
+plotlyjs()
 
 nv = [2, 4, 8, 16]
 nnv = length(nv)
@@ -30,17 +31,17 @@ for (i, n) in enumerate(nv)
     sizeug[i] = sizeof(ug)
     sizeexpgrid[i] = sizeof(expgrid)
 
-    r1 = @benchmark kernelmatrix(ker, ug)
+    r1 = @benchmark kernelmatrix($ker, $ug)
     kermtimeug[i] = median(r1.times)
     kermmemug[i] = r1.memory
-    r2 = @benchmark kernelmatrix(ker, expgrid)
+    r2 = @benchmark kernelmatrix($ker, $expgrid)
     kermtimegrid[i] = median(r2.times)
     kermmemgrid[i] = r2.memory
 
-    rs1 = @benchmark sum.(ug)
+    rs1 = @benchmark sum.($ug)
     sumtimeug[i] = median(rs1.times)
     summemug[i] = rs1.memory
-    rs2 = @benchmark sum.(expgrid)
+    rs2 = @benchmark sum.($expgrid)
     sumtimegrid[i] = median(rs2.times)
     summemgrid[i] = rs2.memory
 end
@@ -48,9 +49,9 @@ end
 elbs = ["" ""]
 # cls = [RGB(.96, .51, 0.19) RGB(0., .57, .88)]
 p1 = plot()
-plot!(p1, nv, [sizeug, sizeexpgrid], label = ["UniformGrid" "Explicit Grid"],
-    xticks = nv, linewidth = 3,
-    xlabel = "Nr Grid Points", ylabel = "Object Size [bytes]")
+plot!(p1, nv, [sizeug, sizeexpgrid]./1e3, label = ["UniformGrid" "Explicit Grid"],
+    xticks = nv, linewidth = 3, legend = :topleft,
+    xlabel = "Nr Grid Points", ylabel = "Object Size [kB]")
 
 p2 = plot()
 plot!(nv, [kermtimeug, kermtimegrid]./1e3, yaxis = :log, xaxis = :log, label = elbs,
@@ -80,7 +81,7 @@ pm = plot(p4, p5)
 pR = plot(pt, pm, layout = (2,1))
 
 p = plot(p1, pR,
-    size = (800, 400),
+    size = (700, 400), margin = 3Plots.Measures.mm,
     layout = grid(1, 2, widths=[0.3 ,0.7]))
 
 
