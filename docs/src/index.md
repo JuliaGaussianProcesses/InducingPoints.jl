@@ -8,22 +8,29 @@ InducingPoints.jl aims at providing an easy way to select inducing points locati
 
 All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which can be passed to the different APIs.
 
-## Offline Inducing Points Selection
+## Quickstart
+InducingPoints.jl provides the following list of algorithms. For details on the specific usage see the [algorithms section](@ref available_algorithms).
 
+
+### Offline Inducing Points Selection
+These algorithms are designed to compute inducing points for a data set that is likely to remain unchanged. 
+If the data set changes, the algorithms have to be rerun from scratch. 
 ```julia
 alg = KMeansAlg(10)
 Z = inducingpoints(alg, X; kwargs...)
 ```
 
 The Offline options are:
-- [`KmeansAlg`](@ref) : use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data
-- [`kDPP`](@ref) : sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`
-- [`StdDPP`](@ref) : sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`
-- [`RandomSubset`](@ref) : sample randomly `k` points from the data set uniformly.
-- [`Greedy`](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way)
-## Online Inducing Points Selection
+- [`KmeansAlg`](@ref) : Use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data.
+- [`kDPP`](@ref) : Sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`.
+- [`StdDPP`](@ref) : Sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`.
+- [`RandomSubset`](@ref) : Sample randomly `k` points from the data set uniformly.
+- [`Greedy`](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way).
 
-Online selection is a bit more involved.
+
+### Online Inducing Points Selection
+
+Online selection algorithms compute an initial set similarly to the offline methods via `inducingpoints`. For successive changes of the data sets, InducingPoints.jl allows for efficient updating via `updateZ!`.
 ```julia
 alg = OIPS()
 Z = inducingpoints(alg, x_1; kwargs...)
@@ -31,9 +38,6 @@ for x in eachbatch(X)
     updateZ!(Z, alg, x; kwargs...)
 end
 ```
-
-With `inducingpoints`, similarly to the offline setting, a first instance of `Z` is created.
-`updateZ!` will then update the vectors in place.
 
 The Online options are:
 - [`OnlineIPSelection`](@ref) : A method based on distance between inducing points and data

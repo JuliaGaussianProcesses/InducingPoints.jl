@@ -44,7 +44,7 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
 end
 ```
 
-# Available Algorithms
+# [Available Algorithms](@id available_algorithms)
 
 
 The algorithms available through InducingPoints.jl can be split into offline and online use. 
