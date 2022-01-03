@@ -26,7 +26,7 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
         markeralpha = 0,
         markerstrokewidth = 3,
         markerstrokealpha = 1,
-        markerstrokecolor = :orangered3,
+        markerstrokecolor = RGB(.96, .51, 0.19),
         label = "Inducing Points Z")
         
     if !isnothing(Z₂)
@@ -37,14 +37,14 @@ function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
         scatter!(p, getindex.(Z₂,1), getindex.(Z₂, 2), 
             marker = :xcross, 
             markersize = 5.5, 
-            color = :seagreen,
+            color = RGB(0., .57, .88),
             label = "Updated Z")
     end
     return p
 end
 ```
 
-# Available Algorithms
+# [Available Algorithms](@id available_algorithms)
 
 
 The algorithms available through InducingPoints.jl can be split into offline and online use. 
@@ -160,7 +160,7 @@ savefig("OIPS.svg"); nothing # hide
 ![](OIPS.svg)
 
 ### [`UniGrid`](@ref) 
-A regularly-spaced grid whose edges are adapted given the data.
+A regularly-spaced grid whose edges are adapted given the data. The inducing points `Z` are returned as the `UniformGrid` custom type (see below). 
 
 ```@example base
 alg = UniGrid(5)
@@ -170,6 +170,13 @@ plot_inducing_points(x, Z, x₂, Z₂) #hide
 savefig("UniGrid.svg"); nothing # hide
 ```
 ![](UniGrid.svg)
+
+#### [`UniformGrid`](@ref)
+When using the `UniGrid` algorithm, InducingPoints.jl provides the memory-efficient custom type [`UniformGrid`](@ref), which is essentially a wrapper around an `Iterators.product`. It functions in many ways like an `AbstractVector`, but does not explicitly store all elements of the grid. Therefore, shown via the example of a two-dimensional grid, the object size only depends on the dimension, not on the number of grid points. 
+
+It is optimized to be very efficient with `kernelmatrix` function provided by `Kernelfunctions.jl`. However, compared to an explicitly stored `Vector` of grid points, it incurs additional overhead when used with other vector operations (illustrated below for the example of broadcasting `sum`).
+
+![](./assets/UniformGrid_bench.svg)
 
 
 ### [`SeqDPP`](@ref) 
