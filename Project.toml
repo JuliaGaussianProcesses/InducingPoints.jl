@@ -5,6 +5,7 @@ version = "0.3.0"
 
 [deps]
 AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 DeterminantalPointProcesses = "4d968f93-c0cd-4b7f-b189-b034d1a24a0e"
