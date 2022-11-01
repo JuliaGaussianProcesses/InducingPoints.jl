@@ -3,7 +3,7 @@ using Distances
 using KernelFunctions
 using KernelFunctions: ColVecs
 using Test
-using Random: seed!
+using Random: seed!, Xoshiro
 include("test_utils.jl")
 
 @testset "InducingPoints.jl" begin

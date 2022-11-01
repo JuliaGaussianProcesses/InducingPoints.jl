@@ -41,3 +41,7 @@ end
 function to_vec_of_vecs(X::AbstractVector, V)
     return V.(X)
 end
+
+convert_back(::Type{<:ColVecs}, X::AbstractVector) = ColVecs(reduce(hcat, X))
+convert_back(::Type{<:RowVecs}, X::AbstractVector) = RowVecs(mapreduce(transpose, vcat, X))
+convert_back(::Type{<:AbstractVector}, X::AbstractVector) = X

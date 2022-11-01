@@ -3,6 +3,7 @@ module InducingPoints
 import Base: rand, show
 
 using AbstractGPs: AbstractGPs
+using AbstractTrees
 using Clustering: kmeans!
 using DataStructures
 using DeterminantalPointProcesses: DPP
@@ -11,7 +12,7 @@ using KernelFunctions
 using KernelFunctions: ColVecs, RowVecs, vec_of_vecs
 using LinearAlgebra#: Symmetric, Eigen, eigen, eigvals, I, logdet, diag, norm
 using Random: rand, bitrand, AbstractRNG, MersenneTwister, GLOBAL_RNG
-using StatsBase: Weights, sample, wsample
+using StatsBase: Weights, sample, wsample, mean
 
 export AbstractInducingPointsSelectionAlg
 
@@ -26,6 +27,7 @@ export KmeansAlg
 export RandomSubset
 export StdDPP, kDPP
 export Greedy
+export CoverTree
 
 ## Online algorithms
 export OIPS
@@ -117,6 +119,7 @@ include("offline/randomsubset.jl")
 include("offline/stddpp.jl")
 include("offline/kdpp.jl")
 include("offline/greedyip.jl")
+include("offline/covertree.jl")
 
 ## Online algorithms
 include("online/seqdpp.jl")
