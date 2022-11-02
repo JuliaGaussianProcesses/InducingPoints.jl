@@ -4,7 +4,8 @@ function test_Zalg(alg::InducingPoints.OnIPSA, N::Int=30, D::Int=3; kwargs...)
             X = rand(T, N) * 10
             Z = inducingpoints(alg, X; arraytype=Vector{T}, kwargs...)
             @test eltype(Z) == T
-            @test inducingpoints(Xoshiro(0), alg, X) == inducingpoints(Xoshiro(0), alg, X)
+            @test inducingpoints(Xoshiro(0), alg, X; kwargs...) ==
+                inducingpoints(Xoshiro(0), alg, X; kwargs...)
             X2 = rand(T, 2 * N) * 10
             Z = updateZ!(Z, alg, X2; kwargs...)
             @test eltype(Z) == T
