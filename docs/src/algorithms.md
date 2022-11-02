@@ -130,7 +130,7 @@ s = 5
 kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 noise = 0.1
 alg = Greedy(M, s)
-Z = inducingpoints(alg, x; y = y, kernel = kernel, noise = noise)
+Z = inducingpoints(alg, x; y, kernel, noise)
 plot_inducing_points(x, Z) #hide
 savefig("Greedy.svg"); nothing # hide
 ```
@@ -173,8 +173,8 @@ A method based on distance between inducing points and data. This algorithm has 
 ```@example base
 kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = OIPS()
-Z = inducingpoints(alg, x; kernel = kernel)
-Z₂ = updateZ(Z, alg, x₂; kernel = kernel)
+Z = inducingpoints(alg, x; kernel)
+Z₂ = updateZ(Z, alg, x₂; kernel)
 plot_inducing_points(x, Z, x₂, Z₂) #hide
 savefig("OIPS.svg"); nothing # hide
 ```
@@ -208,10 +208,10 @@ It is optimized to be very efficient with `kernelmatrix` function provided by `K
 Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditioned on the existing inducing points.
 
 ```@example base
-kernel = SqExponentialKernel()
+kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = SeqDPP()
-Z = inducingpoints(alg, x; kernel = kernel)
-Z₂ = updateZ(Z, alg, x₂; kernel = kernel)
+Z = inducingpoints(alg, x; kernel)
+Z₂ = updateZ(Z, alg, x₂; kernel)
 plot_inducing_points(x, Z, x₂, Z₂) #hide
 savefig("SeqDPP.svg"); nothing # hide
 ```
