@@ -98,7 +98,7 @@ savefig("kdpp.svg"); nothing # hide
 Samples from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`. Requires a kernel from [KernelFunctions.jl](https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/kernels/)
 
 ```@example base
-kernel = SqExponentialKernel()
+kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = StdDPP(kernel)
 Z = inducingpoints(alg, x)
 plot_inducing_points(x, Z) #hide
@@ -127,7 +127,7 @@ This algorithm will select a subset of `X` which maximizes the `ELBO` (Evidence 
 ```@example base
 y = rand(N)
 s = 5
-kernel = SqExponentialKernel()
+kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 noise = 0.1
 alg = Greedy(M, s)
 Z = inducingpoints(alg, x; y = y, kernel = kernel, noise = noise)
@@ -171,7 +171,7 @@ We can then update the inital set of inducing points `Z` via
 A method based on distance between inducing points and data. This algorithm has several parameters to tune the result. It also requires the kernel to be passed as a keyword argument to `inducingpoints` and `updateZ`.
 
 ```@example base
-kernel = SqExponentialKernel() ∘ ScaleTransform(4.0)
+kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = OIPS()
 Z = inducingpoints(alg, x; kernel = kernel)
 Z₂ = updateZ(Z, alg, x₂; kernel = kernel)
