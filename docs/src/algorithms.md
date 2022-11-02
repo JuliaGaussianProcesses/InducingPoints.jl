@@ -144,7 +144,7 @@ The `CoverTree` algorithm is a recent algorithm presented in [Numerically Stable
 It relies on building a covering tree with the nodes representing the inducing points.
 
 ```@example base
-alg = CoverTree(0.01)
+alg = CoverTree(0.2)
 Z = inducingpoints(alg, x)
 plot_inducing_points(x, Z) #hide
 savefig("CoverTree.svg"); nothing # hide
