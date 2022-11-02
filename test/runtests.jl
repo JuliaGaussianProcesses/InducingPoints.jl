@@ -3,7 +3,7 @@ using Distances
 using KernelFunctions
 using KernelFunctions: ColVecs
 using Test
-using Random: seed!, Xoshiro
+using Random: seed!, MersenneTwister
 include("test_utils.jl")
 
 @testset "InducingPoints.jl" begin
