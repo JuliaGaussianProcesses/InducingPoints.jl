@@ -4,7 +4,7 @@
 The CoverTree algorithm [1], recursively builds a tree for which the node will optimally cover the given dataset according to the `metric` distance.
 
 ## Arguments:
-- `ϵ`: Spatial resolution. Higher `ϵ` will result in less points.
+- `ϵ::Real`: Spatial resolution. Higher `ϵ` will result in less points.
 - `lloyds::Bool`: Use the centroid of the ball created around the sampled datapoint instead of the datapoint itself if no other inducing point is close
 - `voronoi::Bool`: Reattributes samples to each node at the end of the proecssing of each layer
 - `metric::SemiMetric`: Distance metric used to determine distance between points. 
@@ -16,7 +16,9 @@ struct CoverTree{Tϵ,Tm} <: OffIPSA
     lloyd::Bool
     voronoi::Bool
     metric::Tm
-    function CoverTree(ϵ::Tϵ=5e-2, lloyd::Bool=true, voronoi::Bool=true, metric::Tm=Euclidean()) where {Tϵ<:Real,Tm<:SemiMetric}
+    function CoverTree(
+        ϵ::Tϵ=5e-2, lloyd::Bool=true, voronoi::Bool=true, metric::Tm=Euclidean()
+    ) where {Tϵ<:Real,Tm<:SemiMetric}
         ϵ > 0 || throw(ArgumentError("The number of inducing points m should be positive"))
         return new{Tϵ,Tm}(ϵ, lloyd, voronoi, metric)
     end
@@ -50,8 +52,9 @@ Base.length(::CoverTreeNode) = 1
 Base.iterate(n::CoverTreeNode) = n, nothing
 Base.iterate(::CoverTreeNode, ::Any) = nothing
 
-
-function inducingpoints(rng::AbstractRNG, alg::CoverTree, X::TX; kwargs...) where {TX<:AbstractVector}
+function inducingpoints(
+    rng::AbstractRNG, alg::CoverTree, X::TX; kwargs...
+) where {TX<:AbstractVector}
     x₀ = mean(X)
     dmax = maximum(Base.Fix1(alg.metric, x₀), X)
     L = ceil(Int, log2(dmax / alg.ϵ))
@@ -68,7 +71,13 @@ function inducingpoints(rng::AbstractRNG, alg::CoverTree, X::TX; kwargs...) wher
     return convert_back(TX, getproperty.(parents, :x))
 end
 
-function distribute(rng::AbstractRNG, alg::CoverTree, parents::AbstractVector{<:CoverTreeNode}, R::Real, X::AbstractVector)
+function distribute(
+    rng::AbstractRNG,
+    alg::CoverTree,
+    parents::AbstractVector{<:CoverTreeNode},
+    R::Real,
+    X::AbstractVector,
+)
     mapreduce(vcat, parents) do p
         children = CoverTreeNode[]
         while !isempty(p.A)
@@ -124,7 +133,9 @@ function assign_neighbours!(
     end
 end
 
-function reassign_data!(alg::CoverTree, nodes::AbstractVector{<:CoverTreeNode}, X::AbstractVector)
+function reassign_data!(
+    alg::CoverTree, nodes::AbstractVector{<:CoverTreeNode}, X::AbstractVector
+)
     for node in nodes
         new_A = Int[]
         for i in node.A
