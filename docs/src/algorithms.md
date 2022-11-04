@@ -1,52 +1,76 @@
 ```@setup base
 using Random: seed!
 seed!(42)
-using KernelFunctions
-using Plots
-plotlyjs()
 using InducingPoints
+using CairoMakie
+using CairoMakie.Colors
+using CairoMakie.Colors.FixedPointNumbers: N0f8
+using KernelFunctions
 D = 2
 N = 50
 M = 10
 x = [rand(D) .* [0.8, 1.0] for _ in 1:N]
 N₂ = 25
 x₂ = [rand(D) .* [0.2, 1.0] + [0.8, 0.0] for _ in 1:N₂]
+color_x = RGB{N0f8}(253 / 255, 132 / 255, 31 / 255)
+color_Z = RGB{N0f8}(225 / 255, 77 / 255, 42 / 255)
+color_Z2 = RGB{N0f8}(62 / 255, 109 / 255, 156 / 255)
+color_x2 = RGB{N0f8}(0 / 255, 18 / 255, 83 / 255)
+markersize = 15.0
+strokewidth = 5.0
 
-function plot_inducing_points(x,Z, x₂ = nothing, Z₂=nothing)
-    p = scatter(getindex.(x, 1), getindex.(x, 2), 
+function plot_inducing_points(x, Z, x₂ = nothing, Z₂ = nothing)
+    fig, ax, plt = scatter(
+        getindex.(x, 1),
+        getindex.(x, 2);
         label = "Original Data",
-        color = :black, 
-        markersize = 8,
-        markerstrokewidth = 0,
-        xlims = [0, 1.], ylims = [0., 1.])
-
-    scatter!(p, getindex.(Z,1), getindex.(Z, 2), 
-        marker = :circle, 
-        markersize = 8,
-        markeralpha = 0,
-        markerstrokewidth = 3,
-        markerstrokealpha = 1,
-        markerstrokecolor = RGB(.96, .51, 0.19),
-        label = "Inducing Points Z")
+        color = color_x,
+        markersize,
+        markerstrokewidth = 2.0
+    )
+    xlims!(ax, [-0.05, 1.05])
+    ylims!(ax, [-0.05, 1.05])
+    scatter!(
+        ax,
+        getindex.(Z,1),
+        getindex.(Z, 2);
+        marker = :circle,
+        markersize = markersize + strokewidth,
+        color = RGBA(color_Z, 0.0),
+        strokewidth,
+        strokecolor = color_Z,
+        label = "Inducing Points Z"
+    )
         
     if !isnothing(Z₂)
-        scatter!(p, getindex.(x₂,1), getindex.(x₂, 2), 
-            markersize = 8, 
-            color = :grey42,
-            label = "Additional Data")
-        scatter!(p, getindex.(Z₂,1), getindex.(Z₂, 2), 
-            marker = :xcross, 
-            markersize = 5.5, 
-            color = RGB(0., .57, .88),
-            label = "Updated Z")
+        scatter!(
+            ax,
+            getindex.(x₂, 1),
+            getindex.(x₂, 2);
+            markersize,
+            color = color_x2,
+            label = "Additional Data",
+        )
+        scatter!(
+            ax,
+            getindex.(Z₂,1),
+            getindex.(Z₂, 2); 
+            # marker = :xcross, 
+            markersize = markersize + 4 * strokewidth,
+            strokewidth,
+            color = RGBA(color_Z2, 0.0),
+            strokecolor = color_Z2,
+            label = "Updated Z",
+        )
     end
-    return p
+    fig[0, 1] = Legend(fig, ax; framevisible=false, tellwidth=false, tellheight=true, orientation=:horizontal)
+    return fig
 end
 ```
 
 # [Available Algorithms](@id available_algorithms)
 
-The algorithms available through InducingPoints.jl can be split into offline and online use.
+The algorithms available through [InducingPoints.jl](https://github.com/JuliaGaussianProcesses/InducingPoints.jl) can be split into offline and online use.
 While all algorithms can be used to create one-off sets of inducing points, the online algorithms are designed in a way that allows for cheap updating.
 
 ```@contents
@@ -73,8 +97,8 @@ Uses the k-means algorithm to select centroids minimizing the square distance wi
 ```@example base
 alg = KmeansAlg(M)
 Z = inducingpoints(alg, x)
-plot_inducing_points(x, Z) #hide
-savefig("kmeans.svg"); nothing # hide
+fig = plot_inducing_points(x, Z) # hide
+save("kmeans.svg", fig); nothing # hide
 ```
 
 ![k-means plot](kmeans.svg)
@@ -87,8 +111,8 @@ Sample from a k-Determinantal Point Process to select `k` points. `Z` will be a 
 kernel = SqExponentialKernel()
 alg = kDPP(M, kernel)
 Z = inducingpoints(alg, x)
-plot_inducing_points(x, Z) #hide
-savefig("kdpp.svg"); nothing # hide
+fig = plot_inducing_points(x, Z) # hide
+save("kdpp.svg", fig); nothing # hide
 ```
 
 ![k-DPP plot](kdpp.svg)
@@ -101,8 +125,8 @@ Samples from a standard Determinantal Point Process. The number of inducing poin
 kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = StdDPP(kernel)
 Z = inducingpoints(alg, x)
-plot_inducing_points(x, Z) #hide
-savefig("StdDPP.svg"); nothing # hide
+fig = plot_inducing_points(x, Z) # hide
+save("StdDPP.svg", fig); nothing # hide
 ```
 
 ![Standard DPP plot](StdDPP.svg)
@@ -114,8 +138,8 @@ Sample randomly `k` points from the data set uniformly.
 ```@example base
 alg = RandomSubset(M)
 Z = inducingpoints(alg, x)
-plot_inducing_points(x, Z) #hide
-savefig("RandomSubset.svg"); nothing # hide
+fig = plot_inducing_points(x, Z) # hide
+save("RandomSubset.svg", fig); nothing # hide
 ```
 
 ![Random subset plot](RandomSubset.svg)
@@ -131,8 +155,8 @@ kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 noise = 0.1
 alg = Greedy(M, s)
 Z = inducingpoints(alg, x; y, kernel, noise)
-plot_inducing_points(x, Z) #hide
-savefig("Greedy.svg"); nothing # hide
+fig = plot_inducing_points(x, Z) # hide
+save("Greedy.svg", fig); nothing # hide
 ```
 
 ![Greedy algorithm plot](Greedy.svg)
@@ -146,8 +170,8 @@ It relies on building a covering tree with the nodes representing the inducing p
 ```@example base
 alg = CoverTree(0.2)
 Z = inducingpoints(alg, x)
-plot_inducing_points(x, Z) #hide
-savefig("CoverTree.svg"); nothing # hide
+fig = plot_inducing_points(x, Z) # hide
+save("CoverTree.svg", fig); nothing # hide
 ```
 
 ![CoverTree algorithm plot](CoverTree.svg)
@@ -175,8 +199,8 @@ kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = OIPS()
 Z = inducingpoints(alg, x; kernel)
 Z₂ = updateZ(Z, alg, x₂; kernel)
-plot_inducing_points(x, Z, x₂, Z₂) #hide
-savefig("OIPS.svg"); nothing # hide
+fig = plot_inducing_points(x, Z, x₂, Z₂) # hide
+save("OIPS.svg", fig); nothing # hide
 ```
 
 ![Online inducing point selection plot](OIPS.svg)
@@ -189,8 +213,8 @@ A regularly-spaced grid whose edges are adapted given the data. The inducing poi
 alg = UniGrid(5)
 Z = inducingpoints(alg, x)
 Z₂ = updateZ(Z, alg, x₂)
-plot_inducing_points(x, Z, x₂, Z₂) #hide
-savefig("UniGrid.svg"); nothing # hide
+fig = plot_inducing_points(x, Z, x₂, Z₂) #hide
+save("UniGrid.svg", fig); nothing # hide
 ```
 
 ![Unigrid plot](UniGrid.svg)
@@ -212,8 +236,8 @@ kernel = with_lengthscale(SqExponentialKernel(), 0.2)
 alg = SeqDPP()
 Z = inducingpoints(alg, x; kernel)
 Z₂ = updateZ(Z, alg, x₂; kernel)
-plot_inducing_points(x, Z, x₂, Z₂) #hide
-savefig("SeqDPP.svg"); nothing # hide
+fig = plot_inducing_points(x, Z, x₂, Z₂) # hide
+save("SeqDPP.svg", fig); nothing # hide
 ```
 
 ![Sequential DPP plot](SeqDPP.svg)
@@ -226,8 +250,8 @@ An online version of k-means.
 alg = StreamKmeans(M)
 Z = inducingpoints(alg, x)
 Z₂ = updateZ(Z, alg, x₂)
-plot_inducing_points(x, Z, x₂, Z₂) #hide
-savefig("StreamKmeans.svg"); nothing # hide
+fig = plot_inducing_points(x, Z, x₂, Z₂) # hide
+save("StreamKmeans.svg", fig); nothing # hide
 ```
 
 ![Stream k-means plot](StreamKmeans.svg)
@@ -240,8 +264,8 @@ Another online version of k-means
 alg = Webscale(M)
 Z = inducingpoints(alg, x)
 Z₂ = updateZ(Z, alg, x₂)
-plot_inducing_points(x, Z, x₂, Z₂) #hide
-savefig("Webscale.svg"); nothing # hide
+fig = plot_inducing_points(x, Z, x₂, Z₂) # hide
+save("Webscale.svg", fig); nothing # hide
 ```
 
 ![Webscale plot](Webscale.svg)
