@@ -9,29 +9,34 @@ These are used most prominently in sparse GP regression (see e.g. [`ApproximateG
 
 
 ## Quickstart
+
 InducingPoints.jl provides the following list of algorithms. For details on the specific usage see the [algorithms section](@ref available_algorithms).
 
 All algorithms inherit from `AbstractInducingPointsSelection` or `AIPSA` which can be passed to the different APIs.
 
 ### Offline Inducing Points Selection
+
 These algorithms are designed to compute inducing points for a data set that is likely to remain unchanged. 
-If the data set changes, the algorithms have to be rerun from scratch. 
+If the data set changes, the algorithms have to be rerun from scratch.
+
 ```julia
 alg = KMeansAlg(10)
 Z = inducingpoints(alg, X; kwargs...)
 ```
 
 The Offline options are:
-- [`KmeansAlg`](@ref) : Use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data.
-- [`kDPP`](@ref) : Sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`.
-- [`StdDPP`](@ref) : Sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`.
-- [`RandomSubset`](@ref) : Sample randomly `k` points from the data set uniformly.
-- [`Greedy`](@ref) : Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way).
 
+- [`KmeansAlg`](@ref): Use the k-means algorithm to select centroids minimizing the square distance with the dataset. The seeding is done via `k-means++`. Note that the inducing points are not going to be a subset of the data.
+- [`kDPP`](@ref): Sample from a k-Determinantal Point Process to select `k` points. `Z` will be a subset of `X`.
+- [`StdDPP`](@ref): Sample from a standard Determinantal Point Process. The number of inducing points is not fixed here. `Z` will be a subset of `X`.
+- [`RandomSubset`](@ref) : Sample randomly `k` points from the data set uniformly.
+- [`Greedy`](@ref): Will select a subset of `X` which maximizes the `ELBO` (in a stochastic way).
+- [`CoverTree`](@ref): Will build a tree to select the optimal nodes covering the data.
 
 ### Online Inducing Points Selection
 
 Online selection algorithms compute an initial set similarly to the offline methods via `inducingpoints`. For successive changes of the data sets, InducingPoints.jl allows for efficient updating via `updateZ!`.
+
 ```julia
 alg = OIPS()
 Z = inducingpoints(alg, x_1; kwargs...)
@@ -41,13 +46,14 @@ end
 ```
 
 The Online options are:
-- [`OnlineIPSelection`](@ref) : A method based on distance between inducing points and data
-- [`UniGrid`](@ref) : A regularly-spaced grid whom edges are adapted given the data. Uses memory efficient custom type [`UniformGrid`](@ref).
-- [`SeqDPP`](@ref) : Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditioned on the existing inducing points.
-- [`StreamKmeans`](@ref) : An online version of k-means.
-- [`Webscale`](@ref) : Another online version of k-means
 
-## Index 
+- [`OnlineIPSelection`](@ref): A method based on distance between inducing points and data
+- [`UniGrid`](@ref): A regularly-spaced grid whom edges are adapted given the data. Uses memory efficient custom type [`UniformGrid`](@ref).
+- [`SeqDPP`](@ref): Sequential Determinantal Point Processes, subsets are regularly sampled from the new data batches conditioned on the existing inducing points.
+- [`StreamKmeans`](@ref): An online version of k-means.
+- [`Webscale`](@ref): Another online version of k-means
+
+## Index
+
 ```@index
 ```
-
