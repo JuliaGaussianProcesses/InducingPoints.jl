@@ -55,6 +55,11 @@ Base.iterate(::CoverTreeNode, ::Any) = nothing
 function inducingpoints(
     rng::AbstractRNG, alg::CoverTree, X::TX; kwargs...
 ) where {TX<:AbstractVector}
+    _, leaves, _ = build_tree(rng, alg, X)
+    return convert_back(TX, leaves)
+end
+
+function build_tree(rng::AbstractRNG, alg::CoverTree, X::AbstractVector)
     x₀ = mean(X)
     dmax = maximum(Base.Fix1(alg.metric, x₀), X)
     L = ceil(Int, log2(dmax / alg.ϵ))
@@ -68,7 +73,7 @@ function inducingpoints(
         alg.voronoi && reassign_data!(alg, children, X)
         parents = children
     end
-    return convert_back(TX, getproperty.(parents, :x))
+    return root, getproperty.(parents, :x), L
 end
 
 function distribute(
