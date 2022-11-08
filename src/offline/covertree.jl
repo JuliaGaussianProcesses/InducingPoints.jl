@@ -63,7 +63,7 @@ function build_tree(rng::AbstractRNG, alg::CoverTree, X::AbstractVector)
     x₀ = mean(X)
     dmax = maximum(Base.Fix1(alg.metric, x₀), X)
     L = ceil(Int, log2(dmax / alg.ϵ))
-    R = 2^L * alg.ϵ
+    R = 2.0^L * alg.ϵ
     root = CoverTreeNode(x₀, R, collect(eachindex(X)))
     parents = [root]
     for l in 2:(L + 1)
