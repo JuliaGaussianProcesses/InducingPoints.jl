@@ -4,11 +4,6 @@
 Computes the partial pivoted Cholesky factorisation of `C`. Runs for at most `M` steps, but
 will stop if the threshold provided by `tol` is met.
 
-A geometric intuition exists for `tol`, but I have yet to write it up properly.
-
-TODO: make it possible to evaluate this on the fly, so that you don't have to construct `C`
-in order to run it, just provide the diagonal, and then provide rows on demand.
-
 This implementation is directly translated from Algorithm 1 in [1].
 
 [1] - L. Foster, A. Waagen, N. Aijaz, M. Hurley, A. Luis, J. Rinsky, C. Satyavolu, M. J.
