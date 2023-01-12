@@ -1,9 +1,10 @@
 @testset "greedy_var_minimization" begin
     @testset "partial_pivoted_cholesky" begin
         @testset "N = $N, M = $M, tol = $tol" for (N, M) in [
-            (5, 2), (5, 5), (10, 2), (10, 10), (50, 2), (50, 25), (50, 50)
-        ],
-        tol in [1e-15, 1e-12, 1e-9, 1e-6, 1e-3, 1e0]
+                (5, 2), (5, 5), (10, 2), (10, 10), (50, 2), (50, 25), (50, 50)
+            ],
+            tol in [1e-15, 1e-12, 1e-9, 1e-6, 1e-3, 1e0]
+
             x = range(0, 1; length=N)
             V, p, M_used = InducingPoints.partial_pivoted_cholesky(SEKernel(), x, M, tol)
             V_M = V[:, 1:M_used]
