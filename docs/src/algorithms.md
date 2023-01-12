@@ -161,6 +161,27 @@ save("Greedy.svg", fig); nothing # hide
 
 ![Greedy algorithm plot](Greedy.svg)
 
+### [`GreedyVarMinimization`](@ref)
+
+Chooses the subset of `x` which minimises `sum(d), d := diag(C_f - C_{fu} C_{uu}^{-1} C_{uf})`.
+Stops when either `M` pseudo-inputs have been chosen, or `maximum(d) < maximum(diag(C_f)) * tol)`.
+See [Stable and Efficient Gaussian Process Calculations](https://www.jmlr.org/papers/volume10/foster09a/foster09a.pdf) and
+[Convergence of Sparse Variational Inference in Gaussian Processes Regression](https://www.jmlr.org/papers/volume21/19-1015/19-1015.pdf) for a
+discussion of this criterion's use in the sparse GP context.
+In this example, a maximum of 50 inducing points can be used, but the algorithm chooses to use
+less than this as the tolerance is satisfied before all 50 are used.
+
+```@example base
+kernel = with_lengthscale(SqExponentialKernel(), 0.2)
+alg = GreedyVarMinimization(50, 1e-6)
+Z = inducingpoints(alg, x; kernel=kernel)
+@show length(Z)
+fig = plot_inducing_points(x, Z) # hide
+save("GreedyVarMinimization.svg", fig); nothing # hide
+```
+
+![Greedy algorithm plot](GreedyVarMinimization.svg)
+
 ### [`CoverTree`](@ref)
 
 The `CoverTree` algorithm is a recent algorithm presented in [Numerically Stable Sparse Gaussian Processes via Minimum Separation using Cover Trees
