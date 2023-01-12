@@ -35,7 +35,7 @@
         N = 1_000_000
         tol = 1e-12
         x = randn(MersenneTwister(123456), N)
-        alg = GreedyVarMinimization(5_000, 1e-12)
+        alg = GreedyVarMinimization(M, tol)
         z = inducingpoints(alg, x; kernel=SEKernel())
         @test length(z) < M
     end
