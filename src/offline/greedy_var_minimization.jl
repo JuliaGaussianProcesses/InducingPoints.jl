@@ -42,7 +42,7 @@ function partial_pivoted_cholesky(k::Kernel, x::AbstractVector, M::Int, tol::Rea
         V[j, j] = sqrt(d_max)
 
         for i in (j + 1):N
-            V[i, j] = (u[i] - dot(view(V, i, 1:j-1), view(V, j, 1:j-1))) / V[j, j]
+            V[i, j] = (u[i] - dot(view(V, i, 1:(j - 1)), view(V, j, 1:(j - 1)))) / V[j, j]
             d[i] -= V[i, j]^2
         end
     end
