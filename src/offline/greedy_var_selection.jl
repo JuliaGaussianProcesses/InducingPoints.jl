@@ -64,7 +64,7 @@ end
 end
 
 """
-    GreedyVarMinimization(m::Int)
+    GreedyVarSelection(m::Int)
 
 Greedy variance minimization approach to inducing point selection. Originally proposed by
 [1], and revisited more recently by [2]. `m` is the desired number of inducing points.
@@ -75,10 +75,10 @@ Greedy variance minimization approach to inducing point selection. Originally pr
 [2] - D. R. Burt, C. E. Rasmussen, and M. van der Wilk. Convergence of Sparse Variational
     Inference in Gaussian Processes Regression. Journal of Machine Learning Research, 2020.
 """
-struct GreedyVarMinimization{Ttol<:Real} <: OffIPSA
+struct GreedyVarSelection{Ttol<:Real} <: OffIPSA
     M::Int
     tol::Ttol
-    function GreedyVarMinimization(M::Int, tol::Ttol) where {Ttol<:Real}
+    function GreedyVarSelection(M::Int, tol::Ttol) where {Ttol<:Real}
         M > 0 || throw(ArgumentError("Number of inducing points should be positive"))
         tol >= 0 || throw(ArgumentError("tol should be non-negative"))
         return new{Ttol}(M, tol)
@@ -87,13 +87,13 @@ end
 
 """
     inducingpoints(
-        rng::AbstractRNG, alg::GreedyVarMinimization, x::AbstractVector; kernel::Kernel
+        rng::AbstractRNG, alg::GreedyVarSelection, x::AbstractVector; kernel::Kernel
     )
 
-See `GreedyVarMinimization` for more info. `rng` isn't actually used here.
+See `GreedyVarSelection` for more info. `rng` isn't actually used here.
 """
 function inducingpoints(
-    rng::AbstractRNG, alg::GreedyVarMinimization, x::AbstractVector; kernel::Kernel
+    rng::AbstractRNG, alg::GreedyVarSelection, x::AbstractVector; kernel::Kernel
 )
     # Don't try to handle this case.
     alg.M > length(x) && throw(ArgumentError("M > length(x). Requires M <= length(x)."))

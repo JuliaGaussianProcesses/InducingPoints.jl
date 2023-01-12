@@ -161,7 +161,7 @@ save("Greedy.svg", fig); nothing # hide
 
 ![Greedy algorithm plot](Greedy.svg)
 
-### [`GreedyVarMinimization`](@ref)
+### [`GreedyVarSelection`](@ref)
 
 Chooses the subset of `x` which minimises `sum(d), d := diag(C_f - C_{fu} C_{uu}^{-1} C_{uf})`.
 Stops when either `M` pseudo-inputs have been chosen, or `maximum(d) < maximum(diag(C_f)) * tol)`.
@@ -173,14 +173,14 @@ less than this as the tolerance is satisfied before all 50 are used.
 
 ```@example base
 kernel = with_lengthscale(SqExponentialKernel(), 0.2)
-alg = GreedyVarMinimization(50, 1e-6)
+alg = GreedyVarSelection(50, 1e-6)
 Z = inducingpoints(alg, x; kernel=kernel)
 @show length(Z)
 fig = plot_inducing_points(x, Z) # hide
-save("GreedyVarMinimization.svg", fig); nothing # hide
+save("GreedyVarSelection.svg", fig); nothing # hide
 ```
 
-![Greedy algorithm plot](GreedyVarMinimization.svg)
+![Greedy algorithm plot](GreedyVarSelection.svg)
 
 ### [`CoverTree`](@ref)
 

@@ -16,13 +16,13 @@
         end
     end
 
-    @testset "GreedyVarMinimization($M, $tol), $N" for (M, N) in [
+    @testset "GreedyVarSelection($M, $tol), $N" for (M, N) in [
             (2, 5), (5, 5), (2, 10), (5, 10), (10, 10)
         ],
         tol in [1e-15, 1e-12, 1e-9, 1e-6, 1e-3, 1e0]
 
         # Verify interface is satisfied.
-        alg = GreedyVarMinimization(M, tol)
+        alg = GreedyVarSelection(M, tol)
         test_Zalg(alg, N, M; kernel=SEKernel())
 
         # Check that at most M pseudo-inputs are produced.
@@ -39,7 +39,7 @@
         N = 1_000_000
         tol = 1e-12
         x = randn(MersenneTwister(123456), N)
-        alg = GreedyVarMinimization(M, tol)
+        alg = GreedyVarSelection(M, tol)
         z = inducingpoints(alg, x; kernel=SEKernel())
         @test length(z) < M
     end

@@ -27,7 +27,7 @@ export KmeansAlg
 export RandomSubset
 export StdDPP, kDPP
 export Greedy
-export GreedyVarMinimization
+export GreedyVarSelection
 export CoverTree
 
 ## Online algorithms
@@ -120,7 +120,7 @@ include("offline/randomsubset.jl")
 include("offline/stddpp.jl")
 include("offline/kdpp.jl")
 include("offline/greedyip.jl")
-include("offline/greedy_var_minimization.jl")
+include("offline/greedy_var_selection.jl")
 include("offline/covertree.jl")
 
 ## Online algorithms
