@@ -1,8 +1,7 @@
 @testset "greedy_var_minimization" begin
-    
     @testset "partial_pivoted_cholesky" begin
         @testset "N = $N, M=$M" for (N, M) in [
-            (5, 2), (5, 5), (10, 2), (10, 10), (50, 2), (50, 25), (50, 50),
+            (5, 2), (5, 5), (10, 2), (10, 10), (50, 2), (50, 25), (50, 50)
         ]
             x = range(0, 1; length=N)
             tol = 1e-18
@@ -15,8 +14,9 @@
         end
     end
 
-    @testset "GreedyVarMinimization($M, $tol), $N" for
-        (M, N) in [(2, 5), (5, 5), (2, 10), (5, 10), (10, 10)],
+    @testset "GreedyVarMinimization($M, $tol), $N" for (M, N) in [
+            (2, 5), (5, 5), (2, 10), (5, 10), (10, 10)
+        ],
         tol in [1e-18, 1e-15, 1e-12, 1e-9, 1e-6, 1e-3, 1e0]
 
         alg = GreedyVarMinimization(M, tol)
