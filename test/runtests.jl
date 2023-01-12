@@ -2,6 +2,7 @@ using InducingPoints
 using Distances
 using KernelFunctions
 using KernelFunctions: ColVecs
+using LinearAlgebra
 using Test
 using Random: seed!, MersenneTwister
 include("test_utils.jl")

@@ -19,10 +19,10 @@ function partial_pivoted_cholesky(k::Kernel, x::AbstractVector, M::Int, tol::Rea
 
     # Initialise output data structures.
     N = length(x)
-    V = Matrix{eltype(d)}(undef, N, M)
-    V .= 0
+    V = zeros(eltype(d), N, M)
     p = collect(1:N)
 
+    # Compute partial pivoted Cholesky.
     for j in 1:M
         d_max, j_max = findmax(view(d, j:N))
         j_max += j - 1
