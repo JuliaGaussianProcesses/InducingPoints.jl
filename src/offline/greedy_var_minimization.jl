@@ -53,12 +53,14 @@ end
     tmp = x[i]
     x[i] = x[j]
     x[j] = tmp
+    return nothing
 end
 
 @inline function switch_rows!(x::Array, i::Int, j::Int)
     tmp = x[i, :]
     x[i, :] .= x[j, :]
     x[j, :] .= tmp
+    return nothing
 end
 
 """
