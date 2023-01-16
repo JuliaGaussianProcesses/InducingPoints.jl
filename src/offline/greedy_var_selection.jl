@@ -28,7 +28,7 @@ function partial_pivoted_cholesky(k::Kernel, x::AbstractVector, M::Int, tol::Rea
         j_max += j - 1
 
         if d_max < tol * C_max
-            return (V, p, j - 1)
+            return (V, p, j - 1, d)
         end
 
         switch!(p, j, j_max)
@@ -45,7 +45,7 @@ function partial_pivoted_cholesky(k::Kernel, x::AbstractVector, M::Int, tol::Rea
             d[i] -= V[i, j]^2
         end
     end
-    return (V, p, M)
+    return (V, p, M, d)
 end
 
 @inline function switch!(x::Array, i::Int, j::Int)
@@ -99,6 +99,6 @@ function inducingpoints(
 
     # Perform the partial Cholesky, and return the elements of `x` residing in the first
     # M_used elements of the permutation vector returned.
-    V, p, M_used = partial_pivoted_cholesky(kernel, x, alg.M, alg.tol)
+    _, p, M_used, _ = partial_pivoted_cholesky(kernel, x, alg.M, alg.tol)
     return x[p[1:M_used]]
 end
