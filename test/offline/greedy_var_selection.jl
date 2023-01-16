@@ -6,7 +6,7 @@
             tol in [1e-15, 1e-12, 1e-9, 1e-6, 1e-3, 1e0]
 
             x = range(0, 1; length=N)
-            V, p, M_used = InducingPoints.partial_pivoted_cholesky(SEKernel(), x, M, tol)
+            V, p, M_used, d = InducingPoints.partial_pivoted_cholesky(SEKernel(), x, M, tol)
             V_M = V[:, 1:M_used]
             p_M = p[1:M_used]
 
@@ -14,6 +14,7 @@
             @test C[p_M, p_M][1:M_used, 1:M_used] ≈ (V_M * V_M')[1:M_used, 1:M_used]
             @test M_used <= M
             @test M_used == M || maximum(diag(C - V_M * V_M')) < maximum(diag(C)) * tol
+            @test all(d .>= -10 * eps(Float64))
         end
     end
 
