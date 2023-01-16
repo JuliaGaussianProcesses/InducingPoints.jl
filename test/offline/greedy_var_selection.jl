@@ -14,6 +14,11 @@
             @test C[p_M, p_M][1:M_used, 1:M_used] ≈ (V_M * V_M')[1:M_used, 1:M_used]
             @test M_used <= M
             @test M_used == M || maximum(diag(C - V_M * V_M')) < maximum(diag(C)) * tol
+
+            # If the kernel is diagonal, no matter the threshold the Cholesky algorithm
+            # should terminate in exactly M steps.
+            V, p, M_used = InducingPoints.partial_pivoted_cholesky(WhiteKernel(), x, M, tol)
+            @test M_used == M
         end
     end
 

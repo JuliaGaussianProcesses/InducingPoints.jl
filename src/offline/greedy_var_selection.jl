@@ -31,18 +31,17 @@ function partial_pivoted_cholesky(k::Kernel, x::AbstractVector, M::Int, tol::Rea
             return (V, p, j - 1)
         end
 
-        if j_max ≢ j
-            switch!(p, j, j_max)
-            switch!(d, j, j_max)
-
-            u .= kernelmatrix(k, x, x[j_max:j_max])
-            switch_rows!(V, j, j_max)
-        end
+        switch!(p, j, j_max)
+        switch!(d, j, j_max)
+        switch_rows!(V, j, j_max, 1:M)
+        u .= kernelmatrix(k, x[p], x[p[j]:p[j]])
 
         V[j, j] = sqrt(d_max)
 
         for i in (j + 1):N
-            V[i, j] = (u[i] - dot(view(V, i, 1:(j - 1)), view(V, j, 1:(j - 1)))) / V[j, j]
+            a = u[i]
+            b = view(V, i, 1:(j - 1))' * view(V, j, 1:(j - 1))
+            V[i, j] = (a - b) / V[j, j]
             d[i] -= V[i, j]^2
         end
     end
@@ -56,10 +55,10 @@ end
     return nothing
 end
 
-@inline function switch_rows!(x::Array, i::Int, j::Int)
-    tmp = x[i, :]
-    x[i, :] .= x[j, :]
-    x[j, :] .= tmp
+@inline function switch_rows!(x::Array, i::Int, j::Int, col_indices)
+    tmp = x[i, col_indices]
+    x[i, col_indices] .= x[j, col_indices]
+    x[j, col_indices] .= tmp
     return nothing
 end
 
