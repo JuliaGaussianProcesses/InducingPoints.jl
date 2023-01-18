@@ -7,7 +7,9 @@ The kernel is passed as a keyword argument to [`inducingpoints`](@ref).
 """
 struct StdDPP <: OffIPSA end
 
-function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kernel::Kernel, kwargs...)
+function inducingpoints(
+    rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kernel::Kernel, kwargs...
+)
     dpp = DPP(kernel, X)
     samp = rand(rng, dpp)
     while isempty(samp) # Sample from the DPP until there is a non-empty set
