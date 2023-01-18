@@ -89,15 +89,3 @@ function greedy_ip(
     end
     return X[collect(ℐᵢₚ)]
 end
-
-# function elbo(Z::AbstractVector, X::AbstractVector, y::AbstractVector, kernel::Kernel, σ²::Real)
-#     Knm = kernelmatrix(kernel, X, Z)
-#     Kmm = kernelmatrix(kernel, Z) + T(jitt) * I
-#     Qff = Knm * (Kmm \ Knm')
-#     Kt = kerneldiagmatrix(kernel, X) .+ T(jitt) - diag(Qff)
-#     Σ = inv(Kmm) + Knm' * Knm / σ²
-#     invQnn = 1/σ² * I - 1/ (σ²)^2 * Knm * inv(Σ) * Knm'
-#     logdetQnn = logdet(Σ) + logdet(Kmm)
-#     return -0.5 * dot(y, invQnn * y) - 0.5 * logdetQnn -
-#            1.0 / (2 * σ²) * sum(Kt)
-# end

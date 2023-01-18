@@ -1,7 +1,8 @@
 """
     SeqDPP()
 
-Sequential sampling via Determinantal Point Processes. Requires passing the `kernel` as keyword argument to `inducingpoints`.
+Sequential sampling via Determinantal Point Processes.
+Requires passing a `kernel::Kernel` as a keyword argument to [`inducingpoints`](@ref).
 """
 struct SeqDPP <: OnIPSA end
 
@@ -11,7 +12,8 @@ Base.show(io::IO, ::SeqDPP) = print(io, "Sequential DPP")
      inducingpoints([rng::AbstractRNG], alg::SeqDPP, X::AbstractVector; kernel::Kernel)
      inducingpoints([rng::AbstractRNG], alg::SeqDPP, X::AbstractMatrix; obsdim=1, kernel::Kernel)
 
-Select inducing points according using Sequential Determinantal Point Processes. Requires as additional keyword argument the `kernel`.
+Select inducing points according using Sequential Determinantal Point Processes.
+Requires passing a `kernel::Kernel` as a keyword argument.
 """
 function inducingpoints(
     rng::AbstractRNG,

@@ -92,7 +92,7 @@ end
 See `GreedyVarSelection` for more info. `rng` isn't actually used here.
 """
 function inducingpoints(
-    rng::AbstractRNG, alg::GreedyVarSelection, x::AbstractVector; kernel::Kernel
+    ::AbstractRNG, alg::GreedyVarSelection, x::AbstractVector; kernel::Kernel
 )
     # Don't try to handle this case.
     alg.M > length(x) && throw(ArgumentError("M > length(x). Requires M <= length(x)."))

@@ -109,8 +109,8 @@ Sample from a k-Determinantal Point Process to select `k` points. `Z` will be a 
 
 ```@example base
 kernel = SqExponentialKernel()
-alg = kDPP(M, kernel)
-Z = inducingpoints(alg, x)
+alg = kDPP(M)
+Z = inducingpoints(alg, x; kernel)
 fig = plot_inducing_points(x, Z) # hide
 save("kdpp.svg", fig); nothing # hide
 ```
@@ -123,8 +123,8 @@ Samples from a standard Determinantal Point Process. The number of inducing poin
 
 ```@example base
 kernel = with_lengthscale(SqExponentialKernel(), 0.2)
-alg = StdDPP(kernel)
-Z = inducingpoints(alg, x)
+alg = StdDPP()
+Z = inducingpoints(alg, x; kernel)
 fig = plot_inducing_points(x, Z) # hide
 save("StdDPP.svg", fig); nothing # hide
 ```
