@@ -1,3 +1,3 @@
 @testset "stddpp.jl" begin
-    test_Zalg(StdDPP(SqExponentialKernel()); kernel=SqExponentialKernel())
+    test_Zalg(StdDPP(); kernel=SqExponentialKernel())
 end
