@@ -6,13 +6,16 @@ The size of the returned `Z` is not fixed (but is not allowed to be empty unlike
 """
 struct StdDPP{K<:Kernel} <: OffIPSA
     kernel::K
-    function StdDPP(kernel::K) where {K<:Kernel}
-        return new{K}(kernel)
-    end
 end
 
-function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kwargs...)
-    dpp = DPP(alg.kernel, X)
+function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kernel=nothing, kwargs...)
+    kernel = if isnothing(kernel)
+        @warn "The API for StdDPP changes in the next breaking release. Please pass the kernel as a keyword argument."
+        alg.kernel
+    else
+        kernel
+    end
+    dpp = DPP(kernel, X)
     samp = rand(rng, dpp)
     while isempty(samp) # Sample from the DPP until there is a non-empty set
         samp = rand(rng, dpp)
