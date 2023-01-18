@@ -13,7 +13,9 @@ struct kDPP <: OffIPSA
     end
 end
 
-function inducingpoints(rng::AbstractRNG, alg::kDPP, X::AbstractVector; kernel::Kernel, kwargs...)
+function inducingpoints(
+    rng::AbstractRNG, alg::kDPP, X::AbstractVector; kernel::Kernel, kwargs...
+)
     if alg.m >= length(X)
         return edge_case(alg.m, length(X), X)
     end
