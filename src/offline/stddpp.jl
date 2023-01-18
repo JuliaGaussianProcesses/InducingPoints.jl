@@ -1,20 +1,13 @@
 @doc raw"""
-    StdDPP(kernel::Kernel)
+    StdDPP()
 
-Standard DPP (Determinantal Point Process) sampling given `kernel`.
+Standard DPP (Determinantal Point Process) sampling.
 The size of the returned `Z` is not fixed (but is not allowed to be empty unlike in a classical DPP).
+The kernel is passed as a keyword argument to [`inducingpoints`](@ref).
 """
-struct StdDPP{K<:Kernel} <: OffIPSA
-    kernel::K
-end
+struct StdDPP <: OffIPSA end
 
-function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kernel=nothing, kwargs...)
-    kernel = if isnothing(kernel)
-        @warn "The API for StdDPP changes in the next breaking release. Please pass the kernel as a keyword argument."
-        alg.kernel
-    else
-        kernel
-    end
+function inducingpoints(rng::AbstractRNG, alg::StdDPP, X::AbstractVector; kernel::Kernel, kwargs...)
     dpp = DPP(kernel, X)
     samp = rand(rng, dpp)
     while isempty(samp) # Sample from the DPP until there is a non-empty set
